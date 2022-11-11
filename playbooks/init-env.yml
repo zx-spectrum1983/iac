@@ -1,0 +1,50 @@
+---
+
+ - hosts: 127.0.0.1
+   connection: local
+   tasks:
+      - name: Init - Install requirements (waiting)
+        apt:
+          pkg:
+            - sudo
+            - wget
+            - curl
+            - unzip
+            - gnupg2
+          update_cache: yes
+      - name: Init - create user ansible
+        user:
+          name: ansible
+          groups:
+           - ansible
+           - sudo
+          state: present
+          shell: /bin/bash
+          createhome: yes
+          home: /home/ansible
+      - name: Init - Disable password for sudoers ansible
+        lineinfile:
+          dest: /etc/sudoers
+          state: present
+          regexp: '^%sudo'
+          line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+          validate: 'visudo -cf %s'
+      - name: Init - Create .ssh directory
+        file:
+          path: /home/ansible/.ssh/
+          state: directory
+      - name: Init - Generate /home/ansible/.ssh/ RSA host key
+        command : ssh-keygen -q -t rsa -b 4096 -f /home/ansible/.ssh/id_rsa -C "" -N ""
+        args:
+          creates: /home/ansible/.ssh/id_rsa
+
+
+
+ - hosts: vault
+   vars_files:
+     - "../group_vars/all.yml"
+   gather_facts: true
+   roles:
+     - '10-inst-docker'
+     - '10-inst-vault'
+
