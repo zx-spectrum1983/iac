@@ -1,0 +1,51 @@
+---
+
+# https://cosced.ru/virtualization/container/docker/running-vault-in-docker-compose/
+
+#  - debug: var=ansible_all_ipv4_addresses
+#  - debug: var=ansible_default_ipv4.address
+
+  - name: Start role
+    debug:
+      msg: "########### INSTALL VAULT IN DOCKER ###########"
+
+  - name: Vault - Create compose project dir
+    file:
+      path: "{{docker_projects_dir}}/vault"
+      state: directory
+
+  - name: Vault - Copy docker-compose.yml and vault.json to project
+    template:
+      src: "{{item}}"
+      dest: "{{docker_projects_dir}}/vault/{{item}}"
+    loop:
+      - docker-compose.yml
+      - config.hcl
+      - vault-init.sh
+
+  - name: Vault - Set execute vault-init.sh
+    file:
+      dest: "{{docker_projects_dir}}/vault/vault-init.sh"
+      mode: a+x
+
+  - name: Vault - Generate access token
+    shell: openssl rand -hex 20
+    register: vault_token
+
+  - name: Vault - Up project
+    shell: cd {{docker_projects_dir}}/vault && docker-compose up --build -d
+    register: output
+    environment:
+      MY_VAULT_TOKEN: "{{vault_token.stdout}}"
+
+  - debug:
+      var: output.stderr_lines
+
+  - debug:
+      var: vault_token.stdout
+
+  - name: Vault - Copy root token to file
+    copy:
+      dest: "{{docker_projects_dir}}/vault/vault-root-token/.access-token"
+      content: "{{vault_token.stdout}}"
+
