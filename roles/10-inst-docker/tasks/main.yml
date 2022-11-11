@@ -1,0 +1,86 @@
+---
+
+  - name: Start role
+    debug:
+      msg: "########### INSTALL DOCKER ###########"
+
+  - name: Docker - Uninstall previous docker
+    apt:
+      pkg:
+        - docker
+        - docker-engine
+        - docker.io
+        - containerd
+        - runc
+      state: absent
+
+  - name: Docker - Install requirements (waiting)
+    apt:
+      pkg:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg2
+        - software-properties-common
+        - lsb-release
+
+  - name: Docker - Check gpg exist
+    stat:
+      path: /etc/apt/keyrings/docker.gpg
+    register: stat_result
+
+  - name: Docker - Add gpg apt-key
+    shell: |
+      sudo mkdir -p /etc/apt/keyrings
+      curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+      sudo chmod a+r /etc/apt/keyrings/docker.gpg
+    when: not stat_result.stat.exists
+
+  - name: Docker - Add docker repo
+    shell: |
+      echo \
+      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+  - name: Docker - Install docker (waiting)
+    apt:
+      pkg:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+      update_cache: yes
+
+  - name: Docker - Check docker-compose installation
+    stat:
+      path: /usr/local/bin/docker-compose
+    register: check_compose
+
+  - name: Docker - Docker-compose install
+    block:
+    - name: Docker-compose - Download docker-compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/v2.6.1/docker-compose-linux-x86_64
+        dest: /usr/local/bin/
+    - name: Docker-compose - Copy docker-compose-linux-x86_64 to docker-compose
+      copy:
+        src: /usr/local/bin/docker-compose-linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+        remote_src: true
+    - name: Docker-compose - Delete docker-compose-linux-x86_64
+      file:
+        path: /usr/local/bin/docker-compose-linux-x86_64
+        state: absent
+    - name: Docker-compose - Make link to docker-compose
+      file:
+        src: /usr/local/bin/docker-compose
+        dest: /usr/bin/docker-compose
+        state: link
+    when: not check_compose.stat.exists
+
+  - name: Docker - create project dir
+    file:
+      path: "{{ docker_projects_dir }}"
+      state: directory
+    
+
