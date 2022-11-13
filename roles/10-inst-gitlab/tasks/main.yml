@@ -1,0 +1,89 @@
+---
+
+  - name: Start role
+    debug:
+      msg: "########### INSTALL GITLAB AND GITLAB-RUNNER IN DOCKER ###########"
+
+  - name: Gitlab - Create gitlab project dir
+    file:
+      path: "{{docker_projects_dir}}/gitlab"
+      state: directory
+
+  - name: Gitlab - Copy docker-compose.yml to project
+    template:
+      src: "docker-compose.yml"
+      dest: "{{docker_projects_dir}}/gitlab/"
+
+  - name: Gitlab - Up project
+    shell: cd {{docker_projects_dir}}/gitlab && docker-compose up -d
+    register: output
+
+  - debug:
+      var: output.stderr_lines
+
+#  - name: Gitlab - Wait for file with pass is create (waiting...)
+#    wait_for:
+#      path: "{{docker_projects_dir}}/gitlab/etc/gitlab/initial_root_password"
+#      state: present
+
+  - name: Gitlab - Wait for building project (take few minutes...)
+    uri:
+      url: "http://{{ansible_default_ipv4.address}}:8000"
+      method: GET
+      status_code: 200
+    register: _result
+    until: _result.status == 200
+    retries: 60
+    delay: 10
+
+  - name: Gitlab - Get root password
+    shell: cat {{docker_projects_dir}}/gitlab/etc/gitlab/initial_root_password | grep "Password:" | awk '{print $2}'
+    register: gitlab_root_pass
+
+  - debug:
+      var: gitlab_root_pass.stdout
+
+  - name: Gitlab - Create new gitlab user (waiting...)
+    shell: |
+      docker exec -i gitlab-ce bash -c "gitlab-rails runner \"u = User.new(username: 'ansible', email: 'ansible@example.com', name: 'ansible', password: '{{gitlab_root_pass.stdout}}', password_confirmation: '{{gitlab_root_pass.stdout}}'); u.skip_confirmation! ; u.save! \""
+
+  - name: Gitlab - Create token (waiting...)
+    shell: |
+      docker exec -i gitlab-ce bash -c "gitlab-rails runner \"token = User.find_by_username('ansible').personal_access_tokens.create(scopes: [:read_user, :api, :read_api, :sudo], name: 'ansible-token'); token.set_token('{{gitlab_root_pass.stdout}}'); token.save! \""
+
+  - name: Gitlab - Create dir for main infra repo
+    file:
+      path: "{{docker_projects_dir}}/{{main_repo}}"
+      state: directory
+
+  - name: Gitlab - Init new main repo {{main_repo}} in gitlab
+    shell: |
+      cd {{docker_projects_dir}}/{{main_repo}}
+      git init --initial-branch=main
+      touch README.md
+      git add -A
+      git commit -m "init repo"
+      git remote add origin http://ansible-token:{{gitlab_root_pass.stdout}}@{{ansible_default_ipv4.address}}:8000/ansible/{{main_repo}}.git
+      git push http://ansible-token:{{gitlab_root_pass.stdout}}@{{ansible_default_ipv4.address}}:8000/ansible/{{main_repo}}.git
+
+
+
+#  - name: Gitlab - Check for glab is installed
+#    stat:
+#      path: /usr/bin/glab
+#    register: stat_glab_result
+
+#  - name: Gitlab - Install glab cli tool
+#    shell: curl -sL https://j.mp/glab-cli | sudo sh
+#    when: not stat_glab_result.stat.exists
+
+#
+# docker exec -i gitlab-ce bash -c "gitlab-rails runner \"token = User.find_by_username('root').personal_access_tokens.create(scopes: [:read_user, :read_repository], name: 'Automation-token'); token.set_token('token-string-here123'); token.save! \""
+# docker exec -it gitlab-ce bash -c "gitlab-rails runner \"token = User.find_by_username('root').personal_access_tokens.create(scopes: [:sudo], name: 'Automation-token1'); token.set_token('token-string-here1234567890'); token.save! \""
+# docker exec -it gitlab-ce bash -c "gitlab-rails runner \"token = User.find_by_username('root').personal_access_tokens.create(scopes: [:read_user, :api, :read_api, :sudo], name: 'Automation-token2'); token.set_token('token-string-here2'); token.save! \""
+# docker exec -it gitlab-ce bash -c "gitlab-rails runner \"u = User.new(username: 'test_user', email: 'test@example.com', name: 'Test User', password: 'password', password_confirmation: 'password'); u.skip_confirmation! ; u.save! \""
+#
+
+
+
+

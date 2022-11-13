@@ -1,0 +1,34 @@
+version: '3.5'
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:15.5.3-ce.0
+    container_name: gitlab-ce
+    hostname: {{ansible_default_ipv4.address}}
+    restart: unless-stopped
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        gitlab_rails['gitlab_shell_ssh_port'] = 8822
+    ports:
+      - "8000:80"
+      - "8822:22"
+    volumes:
+      - ./etc/gitlab:/etc/gitlab
+      - ./var/opt/gitlab:/var/opt/gitlab
+      - ./var/log/gitlab:/var/log/gitlab
+    networks:
+      - gitlab_net
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:alpine
+    container_name: gitlab-runner
+    restart: unless-stopped
+    depends_on:
+      - gitlab
+    volumes:
+      - ./etc/gitlab-runner:/etc/gitlab-runner
+      - ./var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - gitlab_net
+
+networks:
+  gitlab_net:
