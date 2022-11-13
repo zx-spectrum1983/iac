@@ -48,3 +48,18 @@
      - '10-inst-docker'
      - '10-inst-vault'
 
+ - hosts: terraform
+   vars_files:
+     - "../group_vars/all.yml"
+   gather_facts: true
+   roles:
+     - '10-inst-docker'
+     - '10-inst-terraform-esxi'
+
+ - hosts: gitlab
+   vars_files:
+     - "../group_vars/all.yml"
+   gather_facts: true
+   roles:
+     - '10-inst-docker'
+     - '10-inst-gitlab'
