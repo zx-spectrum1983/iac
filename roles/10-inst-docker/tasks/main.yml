@@ -45,7 +45,7 @@
   - name: Docker - Install docker (waiting)
     apt:
       pkg:
-        - docker-ce
+        - docker-ce={{docker_version}}
         - docker-ce-cli
         - containerd.io
       update_cache: yes

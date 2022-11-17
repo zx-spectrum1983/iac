@@ -1,9 +1,11 @@
 <h2> Установка </h2>
 
 ```
-create new VM and connect as root
+create new VM with ansible user
+# ssh ansible@yourserver.local
+# su -
 # apt install git ansible -y
-# cd ~ <br>
+# cd /home/ansible
 # touch init-iac.yml
 # vi init-iac.yml # смотри содержимое файла ниже
 # git clone https://github.com/zx-spectrum1983/iac.git

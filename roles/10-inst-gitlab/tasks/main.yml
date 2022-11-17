@@ -6,25 +6,20 @@
 
   - name: Gitlab - Create gitlab project dir
     file:
-      path: "{{docker_projects_dir}}/gitlab"
+      path: "{{project_dir}}/gitlab"
       state: directory
 
   - name: Gitlab - Copy docker-compose.yml to project
     template:
       src: "docker-compose.yml"
-      dest: "{{docker_projects_dir}}/gitlab/"
+      dest: "{{project_dir}}/gitlab/"
 
   - name: Gitlab - Up project
-    shell: cd {{docker_projects_dir}}/gitlab && docker-compose up -d
+    shell: cd {{project_dir}}/gitlab && docker-compose up -d
     register: output
 
   - debug:
       var: output.stderr_lines
-
-#  - name: Gitlab - Wait for file with pass is create (waiting...)
-#    wait_for:
-#      path: "{{docker_projects_dir}}/gitlab/etc/gitlab/initial_root_password"
-#      state: present
 
   - name: Gitlab - Wait for building project (take few minutes...)
     uri:
@@ -37,34 +32,41 @@
     delay: 10
 
   - name: Gitlab - Get root password
-    shell: cat {{docker_projects_dir}}/gitlab/etc/gitlab/initial_root_password | grep "Password:" | awk '{print $2}'
+    shell: cat {{project_dir}}/gitlab/etc/gitlab/initial_root_password | grep "Password:" | awk '{print $2}'
     register: gitlab_root_pass
 
-  - debug:
-      var: gitlab_root_pass.stdout
+  - local_action: copy content={{ gitlab_root_pass.stdout }} dest="/home/ansible/gitlab_root_password"
+#  - debug:
+#      var: gitlab_root_pass.stdout
+
+  - name: Gitlab - Generate access token
+    shell: openssl rand -hex 20
+    register: gitlab_token
+
+  - local_action: copy content={{ gitlab_token.stdout }} dest="/home/ansible/gitlab_token"
 
   - name: Gitlab - Create new gitlab user (waiting...)
     shell: |
-      docker exec -i gitlab-ce bash -c "gitlab-rails runner \"u = User.new(username: 'ansible', email: 'ansible@example.com', name: 'ansible', password: '{{gitlab_root_pass.stdout}}', password_confirmation: '{{gitlab_root_pass.stdout}}'); u.skip_confirmation! ; u.save! \""
+      docker exec -i gitlab-ce bash -c "gitlab-rails runner \"u = User.new(username: '{{gitlab_username}}', email: '{{gitlab_email}}', name: '{{gitlab_username}}', password: '{{gitlab_password}}', password_confirmation: '{{gitlab_password}}'); u.skip_confirmation! ; u.save! \""
 
   - name: Gitlab - Create token (waiting...)
     shell: |
-      docker exec -i gitlab-ce bash -c "gitlab-rails runner \"token = User.find_by_username('ansible').personal_access_tokens.create(scopes: [:read_user, :api, :read_api, :sudo], name: 'ansible-token'); token.set_token('{{gitlab_root_pass.stdout}}'); token.save! \""
+      docker exec -i gitlab-ce bash -c "gitlab-rails runner \"token = User.find_by_username('{{gitlab_username}}').personal_access_tokens.create(scopes: [:read_user, :api, :read_api, :sudo], name: 'ansible-token'); token.set_token('{{gitlab_token.stdout}}'); token.save! \""
 
-  - name: Gitlab - Create dir for main infra repo
-    file:
-      path: "{{docker_projects_dir}}/{{main_repo}}"
-      state: directory
+#  - name: Gitlab - Create dir for main infra repo
+#    file:
+#      path: "{{docker_projects_dir}}/{{main_repo}}"
+#      state: directory
 
-  - name: Gitlab - Init new main repo {{main_repo}} in gitlab
-    shell: |
-      cd {{docker_projects_dir}}/{{main_repo}}
-      git init --initial-branch=main
-      touch README.md
-      git add -A
-      git commit -m "init repo"
-      git remote add origin http://ansible-token:{{gitlab_root_pass.stdout}}@{{ansible_default_ipv4.address}}:8000/ansible/{{main_repo}}.git
-      git push http://ansible-token:{{gitlab_root_pass.stdout}}@{{ansible_default_ipv4.address}}:8000/ansible/{{main_repo}}.git
+#  - name: Gitlab - Init new main repo {{main_repo}} in gitlab
+#    shell: |
+#      cd {{docker_projects_dir}}/{{main_repo}}
+#      git init --initial-branch=main
+#      touch README.md
+#      git add -A
+#      git commit -m "init repo"
+#      git remote add origin http://ansible-token:{{gitlab_root_pass.stdout}}@{{ansible_default_ipv4.address}}:8000/ansible/{{main_repo}}.git
+#      git push http://ansible-token:{{gitlab_root_pass.stdout}}@{{ansible_default_ipv4.address}}:8000/ansible/{{main_repo}}.git
 
 
 
