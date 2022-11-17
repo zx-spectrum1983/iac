@@ -1,16 +1,18 @@
-Установка:
- #create new VM and connect as root
- apt install git ansible -y
- cd ~
- touch init-iac.yml
- vi init-iac.yml # смотри содержимое файла ниже
- git clone https://github.com/zx-spectrum1983/iac.git
- cd iac
- ansible-playbook playbooks/init-env.yml
+<h2> Установка </h2>
+ - #create new VM and connect as root
+ - apt install git ansible -y
+ - cd ~
+ - touch init-iac.yml
+ - vi init-iac.yml # смотри содержимое файла ниже
+ - git clone https://github.com/zx-spectrum1983/iac.git
+ - cd iac
+ - ansible-playbook playbooks/init-env.yml
 
 
 
-Содержимое файла init-iac.yml
+<h2>Содержимое файла init-iac.yml</h2>
+
+```
 init_ansible_password            : ansible
 project_dir                      : "/opt"
 
@@ -38,3 +40,5 @@ tf_vm_template_disk_size         : 16384
 tf_vm_template_disk_thin         : "true"
 tf_vm_template_addition_pkgs     : "git ansible"
 tf_vm_template_ssh_key           : "/home/ansible/.ssh/id_rsa.pub"
+```
+
