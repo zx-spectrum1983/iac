@@ -1,14 +1,14 @@
 <h2> Установка </h2>
- - #create new VM and connect as root
- - apt install git ansible -y
- - cd ~
- - touch init-iac.yml
- - vi init-iac.yml # смотри содержимое файла ниже
- - git clone https://github.com/zx-spectrum1983/iac.git
- - cd iac
- - ansible-playbook playbooks/init-env.yml
-
-
+```
+<create new VM and connect as root>
+# apt install git ansible -y
+# cd ~ <br>
+# touch init-iac.yml
+# vi init-iac.yml # смотри содержимое файла ниже
+# git clone https://github.com/zx-spectrum1983/iac.git
+# cd iac
+# ansible-playbook playbooks/init-env.yml
+```
 
 <h2>Содержимое файла init-iac.yml</h2>
 
