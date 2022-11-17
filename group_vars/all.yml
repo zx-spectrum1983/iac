@@ -2,6 +2,3 @@
 ansible_become: yes
 ansible_user: ansible
 
-#init_terraform_provider: "esxi"
-docker_projects_dir: "/home/ansible/projects"
-main_repo: "infra"

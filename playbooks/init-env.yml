@@ -1,6 +1,8 @@
 ---
 
  - hosts: 127.0.0.1
+   vars_files:
+     - "../../init-iac.yml"
    connection: local
    tasks:
       - name: Init - Install requirements (waiting)
@@ -15,6 +17,10 @@
       - name: Init - create user ansible
         user:
           name: ansible
+          password: "{{ init_ansible_password | password_hash('sha512') }}"
+          generate_ssh_key: yes
+          ssh_key_bits: 4096
+          ssh_key_file: .ssh/id_rsa
           groups:
            - ansible
            - sudo
@@ -29,37 +35,28 @@
           regexp: '^%sudo'
           line: '%sudo ALL=(ALL) NOPASSWD: ALL'
           validate: 'visudo -cf %s'
-      - name: Init - Create .ssh directory
-        file:
-          path: /home/ansible/.ssh/
-          state: directory
-      - name: Init - Generate /home/ansible/.ssh/ RSA host key
-        command : ssh-keygen -q -t rsa -b 4096 -f /home/ansible/.ssh/id_rsa -C "" -N ""
-        args:
-          creates: /home/ansible/.ssh/id_rsa
 
 
-
- - hosts: vault
-   vars_files:
-     - "../group_vars/all.yml"
-   gather_facts: true
-   roles:
-     - '10-inst-docker'
-     - '10-inst-vault'
+# - hosts: vault
+#   vars_files:
+#     - "../group_vars/all.yml"
+#   gather_facts: true
+#   roles:
+#     - '10-inst-docker'
+#     - '10-inst-vault'
 
  - hosts: terraform
    vars_files:
+     - "../../init-iac.yml"
      - "../group_vars/all.yml"
    gather_facts: true
    roles:
-     - '10-inst-docker'
-     - '10-inst-terraform-esxi'
+     - '10-inst-terraform-vsphere'
 
- - hosts: gitlab
-   vars_files:
-     - "../group_vars/all.yml"
-   gather_facts: true
-   roles:
-     - '10-inst-docker'
-     - '10-inst-gitlab'
+# - hosts: gitlab
+#   vars_files:
+#     - "../group_vars/all.yml"
+#   gather_facts: true
+#   roles:
+#     - '10-inst-docker'
+#     - '10-inst-gitlab'
