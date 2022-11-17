@@ -4,38 +4,8 @@
    vars_files:
      - "../../init-iac.yml"
    connection: local
-   tasks:
-      - name: Init - Install requirements (waiting)
-        apt:
-          pkg:
-            - sudo
-            - wget
-            - curl
-            - unzip
-            - gnupg2
-          update_cache: yes
-      - name: Init - create user ansible
-        user:
-          name: ansible
-          password: "{{ init_ansible_password | password_hash('sha512') }}"
-          generate_ssh_key: yes
-          ssh_key_bits: 4096
-          ssh_key_file: .ssh/id_rsa
-          groups:
-           - ansible
-           - sudo
-          state: present
-          shell: /bin/bash
-          createhome: yes
-          home: /home/ansible
-      - name: Init - Disable password for sudoers ansible
-        lineinfile:
-          dest: /etc/sudoers
-          state: present
-          regexp: '^%sudo'
-          line: '%sudo ALL=(ALL) NOPASSWD: ALL'
-          validate: 'visudo -cf %s'
-
+   roles:
+     - '0-init-host'
 
 # - hosts: vault
 #   vars_files:
@@ -49,7 +19,8 @@
    vars_files:
      - "../../init-iac.yml"
      - "../group_vars/all.yml"
-   gather_facts: true
+#   gather_facts: true
+   connection: local
    roles:
      - '10-inst-terraform-vsphere'
 
