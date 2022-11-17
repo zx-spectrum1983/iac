@@ -1,6 +1,7 @@
 <h2> Установка </h2>
+
 ```
-<create new VM and connect as root>
+create new VM and connect as root
 # apt install git ansible -y
 # cd ~ <br>
 # touch init-iac.yml
