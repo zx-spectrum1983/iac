@@ -21,13 +21,13 @@
 
   - name: Terraform - Create terraform plugins dir
     file:
-      path: "~/terraform.d"
+      path: "~/.terraform.d"
       state: directory
 
   - name: Terraform - Extract vsphere provider
     unarchive:
       src: "{{tf_provider_archive}}"
-      dest: "~/terraform.d"
+      dest: "~/.terraform.d"
 
   - name: Terraform - Create vm template
     block:

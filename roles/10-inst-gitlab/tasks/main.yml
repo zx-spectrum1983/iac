@@ -65,7 +65,7 @@
       shell: |
         cd /home/ansible/iac
         git remote rename origin init
-        git remote add origin http://ansible-token:{{gitlab_root_pass.stdout}}@{{ansible_default_ipv4.address}}:8000/ansible/{{main_repo}}.git
+        git remote add origin http://ansible-token:{{gitlab_token.stdout}}@{{ansible_default_ipv4.address}}:8000/ansible/iac.git
         git push origin
 
     when: not gitlab_status.stat.exists
