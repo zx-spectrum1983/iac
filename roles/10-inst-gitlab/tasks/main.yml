@@ -61,45 +61,17 @@
       shell: |
         docker exec -i gitlab-ce bash -c "gitlab-rails runner \"token = User.find_by_username('{{gitlab_username}}').personal_access_tokens.create(scopes: [:read_user, :api, :read_api, :sudo], name: 'ansible-token'); token.set_token('{{gitlab_token.stdout}}'); token.save! \""
 
+    - name: Gitlab deploy - switch git repo to local server
+      shell: |
+        cd /home/ansible/iac
+        git remote set-url origin http://ansible-token:{{gitlab_root_pass.stdout}}@{{ansible_default_ipv4.address}}:8000/ansible/{{main_repo}}.git
+        git push
+
     when: not gitlab_status.stat.exists
 
 
 
 
-
-
-#  - name: Gitlab - Create dir for main infra repo
-#    file:
-#      path: "{{docker_projects_dir}}/{{main_repo}}"
-#      state: directory
-
-#  - name: Gitlab - Init new main repo {{main_repo}} in gitlab
-#    shell: |
-#      cd {{docker_projects_dir}}/{{main_repo}}
-#      git init --initial-branch=main
-#      touch README.md
-#      git add -A
-#      git commit -m "init repo"
-#      git remote add origin http://ansible-token:{{gitlab_root_pass.stdout}}@{{ansible_default_ipv4.address}}:8000/ansible/{{main_repo}}.git
-#      git push http://ansible-token:{{gitlab_root_pass.stdout}}@{{ansible_default_ipv4.address}}:8000/ansible/{{main_repo}}.git
-
-
-
-#  - name: Gitlab - Check for glab is installed
-#    stat:
-#      path: /usr/bin/glab
-#    register: stat_glab_result
-
-#  - name: Gitlab - Install glab cli tool
-#    shell: curl -sL https://j.mp/glab-cli | sudo sh
-#    when: not stat_glab_result.stat.exists
-
-#
-# docker exec -i gitlab-ce bash -c "gitlab-rails runner \"token = User.find_by_username('root').personal_access_tokens.create(scopes: [:read_user, :read_repository], name: 'Automation-token'); token.set_token('token-string-here123'); token.save! \""
-# docker exec -it gitlab-ce bash -c "gitlab-rails runner \"token = User.find_by_username('root').personal_access_tokens.create(scopes: [:sudo], name: 'Automation-token1'); token.set_token('token-string-here1234567890'); token.save! \""
-# docker exec -it gitlab-ce bash -c "gitlab-rails runner \"token = User.find_by_username('root').personal_access_tokens.create(scopes: [:read_user, :api, :read_api, :sudo], name: 'Automation-token2'); token.set_token('token-string-here2'); token.save! \""
-# docker exec -it gitlab-ce bash -c "gitlab-rails runner \"u = User.new(username: 'test_user', email: 'test@example.com', name: 'Test User', password: 'password', password_confirmation: 'password'); u.skip_confirmation! ; u.save! \""
-#
 
 
 
