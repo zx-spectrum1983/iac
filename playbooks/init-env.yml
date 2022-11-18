@@ -19,13 +19,13 @@
    vars_files:
      - "../../init-iac.yml"
      - "../group_vars/all.yml"
-#   gather_facts: true
    connection: local
    roles:
      - '10-inst-terraform-vsphere'
 
  - hosts: 127.0.0.1
    vars_files:
+     - "../../init-iac.yml"
      - "../group_vars/all.yml"
    gather_facts: true
    connection: local

@@ -80,7 +80,7 @@
 
   - name: Docker - create project dir
     file:
-      path: "{{ docker_projects_dir }}"
+      path: "{{ project_dir }}"
       state: directory
     
 

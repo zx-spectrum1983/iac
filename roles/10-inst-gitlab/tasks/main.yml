@@ -14,44 +14,59 @@
       src: "docker-compose.yml"
       dest: "{{project_dir}}/gitlab/"
 
-  - name: Gitlab - Up project
-    shell: cd {{project_dir}}/gitlab && docker-compose up -d
-    register: output
+  - name: Gitlab - check deploy
+    stat:
+      path: /home/ansible/gitlab_token
+    register: gitlab_status
 
-  - debug:
-      var: output.stderr_lines
 
-  - name: Gitlab - Wait for building project (take few minutes...)
-    uri:
-      url: "http://{{ansible_default_ipv4.address}}:8000"
-      method: GET
-      status_code: 200
-    register: _result
-    until: _result.status == 200
-    retries: 60
-    delay: 10
 
-  - name: Gitlab - Get root password
-    shell: cat {{project_dir}}/gitlab/etc/gitlab/initial_root_password | grep "Password:" | awk '{print $2}'
-    register: gitlab_root_pass
+  - name: Gitlab - deploy if not exist
+    block:
 
-  - local_action: copy content={{ gitlab_root_pass.stdout }} dest="/home/ansible/gitlab_root_password"
-#  - debug:
-#      var: gitlab_root_pass.stdout
+    - name: Gitlab deploy - Up project
+      shell: cd {{project_dir}}/gitlab && docker-compose up -d
+      register: output
 
-  - name: Gitlab - Generate access token
-    shell: openssl rand -hex 20
-    register: gitlab_token
+    - debug:
+        var: output.stderr_lines
 
-  - local_action: copy content={{ gitlab_token.stdout }} dest="/home/ansible/gitlab_token"
+    - name: Gitlab deploy - Wait for building project (take few minutes...)
+      uri:
+        url: "http://{{ansible_default_ipv4.address}}:8000"
+        method: GET
+        status_code: 200
+      register: _result
+      until: _result.status == 200
+      retries: 60
+      delay: 10
 
-  - name: Gitlab - Create new gitlab user (waiting...)
-    shell: |
-      docker exec -i gitlab-ce bash -c "gitlab-rails runner \"u = User.new(username: '{{gitlab_username}}', email: '{{gitlab_email}}', name: '{{gitlab_username}}', password: '{{gitlab_password}}', password_confirmation: '{{gitlab_password}}'); u.skip_confirmation! ; u.save! \""
+    - name: Gitlab deploy - Get root password
+      shell: cat {{project_dir}}/gitlab/etc/gitlab/initial_root_password | grep "Password:" | awk '{print $2}'
+      register: gitlab_root_pass
 
-  - name: Gitlab - Create token (waiting...)
-    shell: |
-      docker exec -i gitlab-ce bash -c "gitlab-rails runner \"token = User.find_by_username('{{gitlab_username}}').personal_access_tokens.create(scopes: [:read_user, :api, :read_api, :sudo], name: 'ansible-token'); token.set_token('{{gitlab_token.stdout}}'); token.save! \""
+    - local_action: copy content={{ gitlab_root_pass.stdout }} dest="/home/ansible/gitlab_root_password"
+
+    - name: Gitlab deploy - Generate access token
+      shell: openssl rand -hex 20
+      register: gitlab_token
+
+    - local_action: copy content={{ gitlab_token.stdout }} dest="/home/ansible/gitlab_token"
+
+    - name: Gitlab deploy - Create new gitlab user (waiting...)
+      shell: |
+        docker exec -i gitlab-ce bash -c "gitlab-rails runner \"u = User.new(username: '{{gitlab_username}}', email: '{{gitlab_email}}', name: '{{gitlab_username}}', password: '{{gitlab_password}}', password_confirmation: '{{gitlab_password}}'); u.skip_confirmation! ; u.save! \""
+
+    - name: Gitlab deploy - Create token (waiting...)
+      shell: |
+        docker exec -i gitlab-ce bash -c "gitlab-rails runner \"token = User.find_by_username('{{gitlab_username}}').personal_access_tokens.create(scopes: [:read_user, :api, :read_api, :sudo], name: 'ansible-token'); token.set_token('{{gitlab_token.stdout}}'); token.save! \""
+
+    when: not gitlab_status.stat.exists
+
+
+
+
+
 
 #  - name: Gitlab - Create dir for main infra repo
 #    file:
