@@ -17,7 +17,7 @@
   - name: Init - create user ansible
     user:
       name: ansible
-      password: "{{ init_ansible_password | password_hash('sha512') }}"
+#      password: "{{ init_ansible_password | password_hash('sha512') }}"
       generate_ssh_key: yes
       ssh_key_bits: 4096
       ssh_key_file: .ssh/id_rsa
