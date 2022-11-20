@@ -33,19 +33,19 @@
     block:
       - name: Packer - create workdir
         file:
-          path: "{{project_dir}}/terraform/packer"
+          path: "{{project_dir}}/packer"
           state: directory
       - name: Packer - copy conf files
         template:
           src: "packer/{{item.srcf}}"
-          dest: "{{project_dir}}/terraform/packer/{{item.dstf}}"
+          dest: "{{project_dir}}/packer/{{item.dstf}}"
         loop:
           - { srcf: 'preseed.cfg.j2', dstf: 'preseed.cfg' }
           - { srcf: 'variables.pkr.hcl', dstf: 'variables.pkr.hcl' }
           - { srcf: 'vars.auto.pkrvars.hcl.j2', dstf: 'vars.auto.pkrvars.hcl' }
           - { srcf: 'vsphere-iso_basic_ubuntu.pkr.hcl.j2', dstf: 'vsphere-iso_basic_ubuntu.pkr.hcl' }
       - name: Packer - create template {{tf_vm_template_name}}, may take long time
-        shell: cd {{project_dir}}/terraform/packer/ && packer build .
+        shell: cd {{project_dir}}/packer/ && packer build .
         register: output
       - debug: var=output.stdout_lines
     when: tf_vm_template == true

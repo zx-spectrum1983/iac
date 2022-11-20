@@ -5,6 +5,12 @@ d-i debian-installer/locale string en_US
 d-i console-setup/ask_detect boolean false
 d-i keyboard-configuration/xkb-keymap select us
 
+# Any hostname and domain names assigned from dhcp take precedence over
+# values set here. However, setting the values still prevents the questions
+# from being shown, even if values come from dhcp.
+d-i netcfg/get_hostname string {{tf_vm_template_name}}
+d-i netcfg/get_domain string
+
 choose-mirror-bin mirror/http/proxy string
 
 ### Clock and time zone setup
@@ -55,7 +61,7 @@ d-i user-setup/encrypt-home boolean false
 
 ### Package selection
 tasksel tasksel/first standard
-d-i pkgsel/include string openssh-server nfs-common open-vm-tools build-essential {{tf_vm_template_addition_pkgs}}
+d-i pkgsel/include string openssh-server nfs-common open-vm-tools build-essential perl {{tf_vm_template_addition_pkgs}}
 d-i pkgsel/install-language-support boolean false
 
 # disable automatic package updates
@@ -64,6 +70,8 @@ d-i pkgsel/upgrade select full-upgrade
 
 ### Preseeding other packages
 #### Advanced options
+### Preseeding other packages
+#### Advanced options
 d-i preseed/late_command string \
-in-target mkdir -p /target/home/{{tf_vm_template_ssh_username}}/.ssh; \
-in-target echo "{{ lookup('file', tf_vm_template_ssh_key) | trim}}" > /target/home/{{tf_vm_template_ssh_username}}/.ssh/authorized_keys; \
+    echo '{{tf_vm_template_ssh_username}} ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/{{tf_vm_template_ssh_username}} ; \
+    in-target chmod 440 /etc/sudoers.d/{{tf_vm_template_ssh_username}}
