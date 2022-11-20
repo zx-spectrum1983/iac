@@ -38,9 +38,9 @@ source "vsphere-iso" "this" {
 {% raw %}
     "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg <wait>",
 {% endraw %}
-    "debian-installer=en_US.UTF-8 <wait>",
+    "debian-installer=ru_RU.UTF-8 <wait>",
     "auto <wait>",
-    "locale=en_US.UTF-8 <wait>",
+    "locale=ru_RU.UTF-8 <wait>",
     "kbd-chooser/method=us <wait>",
     "keyboard-configuration/xkb-keymap=us <wait>",
     "netcfg/get_hostname={{tf_packer_debian11_name}} <wait>",
