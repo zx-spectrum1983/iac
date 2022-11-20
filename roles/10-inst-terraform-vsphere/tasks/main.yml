@@ -38,6 +38,11 @@
       - { srcf: 'variables.tf.j2', dstf: 'variables.tf' }
       - { srcf: 'versions.tf', dstf: 'versions.tf' }
 
+  - name: Terraform - Init project
+    shell: cd {{project_dir}}/terraform/ && terraform init -no-color
+    register: output
+  - debug: var=output.stdout_lines
+
   - name: Terraform - Create vm template
     block:
       - name: Packer - create workdir
