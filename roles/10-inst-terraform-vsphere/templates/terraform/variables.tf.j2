@@ -1,0 +1,17 @@
+locals {
+  vsphere_server       = "{{tf_vsphere_server}}"
+  vsphere_user         = "{{tf_vsphere_user}}"
+  vsphere_password     = "{{tf_vsphere_password}}"
+  datacenter           = "{{tf_datacenter}}"
+  cluster              = "{{tf_host}}"
+  
+  network_name         = "{{tf_network_name}}"
+
+  vms = merge(var.empty,)
+
+}
+
+variable "empty" {
+    type = map
+    default = {}
+}
