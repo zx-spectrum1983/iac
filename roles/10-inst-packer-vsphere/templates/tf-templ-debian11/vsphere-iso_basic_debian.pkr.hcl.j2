@@ -1,0 +1,65 @@
+source "vsphere-iso" "this" {
+  vcenter_server    = var.vsphere_server
+  username          = var.vsphere_user
+  password          = var.vsphere_password
+  datacenter        = var.datacenter
+  cluster           = var.cluster
+  insecure_connection  = true
+
+  vm_name = "{{tf_packer_debian11_name}}"
+  guest_os_type = "debian10_64Guest"
+
+  ssh_username = "{{tf_packer_init_ssh_username}}"
+  ssh_password = "{{tf_packer_init_ssh_password}}"
+
+  CPUs =             {{tf_packer_debian11_CPUs}}
+  RAM =              {{tf_packer_debian11_RAM}}
+  RAM_reserve_all = true
+
+  disk_controller_type =  ["pvscsi"]
+  datastore = var.datastore
+  storage {
+    disk_size =        {{tf_packer_debian11_size}}
+    disk_thin_provisioned = true
+  }
+
+  iso_paths = ["{{tf_packer_debian11_iso_path}}"]
+
+  network_adapters {
+    network =  var.network_name
+    network_card = "vmxnet3"
+  }
+
+  http_directory = "{{project_dir}}/packer/tf-templ-debian11"
+
+  boot_command = [
+    "<esc><wait>",
+    "install <wait>",
+{% raw %}
+    "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg <wait>",
+{% endraw %}
+    "debian-installer=en_US.UTF-8 <wait>",
+    "auto <wait>",
+    "locale=en_US.UTF-8 <wait>",
+    "kbd-chooser/method=us <wait>",
+    "keyboard-configuration/xkb-keymap=us <wait>",
+    "netcfg/get_hostname={{tf_packer_debian11_name}} <wait>",
+    "netcfg/get_domain=vsphere.local <wait>",
+    "fb=false <wait>",
+    "debconf/frontend=noninteractive <wait>",
+    "console-setup/ask_detect=false <wait>",
+    "console-keymaps-at/keymap=us <wait>",
+    "grub-installer/bootdev=/dev/sda <wait>",
+    "<enter><wait>"
+  ]
+}
+
+build {
+  sources  = [
+    "source.vsphere-iso.this"
+  ]
+
+  provisioner "shell-local" {
+    inline  = ["echo the address is: $PACKER_HTTP_ADDR and build name is: $PACKER_BUILD_NAME"]
+  }
+}

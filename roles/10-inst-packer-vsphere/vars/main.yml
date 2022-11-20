@@ -1,0 +1,17 @@
+
+tf_packer_archive                : "packer_1.8.1_linux_amd64.zip"
+
+tf_packer_debian11               : true
+tf_packer_debian11_name          : "tf-templ-debian11"
+tf_packer_debian11_CPUs          : 1
+tf_packer_debian11_RAM           : 1024
+tf_packer_debian11_size          : 16384
+tf_packer_debian11_addition_pkgs : "git ansible mc"
+
+
+tf_packer_ubuntu14               : true
+tf_packer_ubuntu14_name          : "tf-templ-ubuntu14"
+tf_packer_ubuntu14_CPUs          : 1
+tf_packer_ubuntu14_RAM           : 1024
+tf_packer_ubuntu14_size          : 16384
+tf_packer_ubuntu14_addition_pkgs : "git ansible mc"

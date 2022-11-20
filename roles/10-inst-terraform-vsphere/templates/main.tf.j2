@@ -24,7 +24,8 @@ data "vsphere_datastore" "datastore" {
 }
 
 data "vsphere_network" "network" {
-  name           = local.network_name
+  for_each = local.vms
+  name           = each.value.network
   datacenter_id  = data.vsphere_datacenter.dc.id
 }
 
@@ -74,16 +75,16 @@ resource "vsphere_virtual_machine" "vm" {
       "sudo hostnamectl set-hostname ${each.value.name}",
       "sudo sed -i 's/${each.value.template}/${each.value.name}/g' /etc/hosts",
       "sudo pkill dhclient && sudo /sbin/dhclient -4",
-      "mkdir /home/{{tf_vm_template_ssh_username}}/.ssh && touch /home/{{tf_vm_template_ssh_username}}/.ssh/authorized_keys",
-      "chmod 700 /home/{{tf_vm_template_ssh_username}}/.ssh && chmod 600 /home/{{tf_vm_template_ssh_username}}/.ssh/authorized_keys",
-      "cat /tmp/id_rsa.pub >> /home/{{tf_vm_template_ssh_username}}/.ssh/authorized_keys",
+      "mkdir /home/{{tf_packer_init_ssh_username}}/.ssh && touch /home/{{tf_packer_init_ssh_username}}/.ssh/authorized_keys",
+      "chmod 700 /home/{{tf_packer_init_ssh_username}}/.ssh && chmod 600 /home/{{tf_packer_init_ssh_username}}/.ssh/authorized_keys",
+      "cat /tmp/id_rsa.pub >> /home/{{tf_packer_init_ssh_username}}/.ssh/authorized_keys",
     ]
   }
   connection {
     type = "ssh"
     host = "${self.guest_ip_addresses[0]}"
-    user = "{{tf_vm_template_ssh_username}}"
-    password = "{{tf_vm_template_ssh_password}}"
+    user = "{{tf_packer_init_ssh_username}}"
+    password = "{{tf_packer_init_ssh_password}}"
     port = "22"
     agent = false
     }

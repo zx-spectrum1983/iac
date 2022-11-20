@@ -1,0 +1,53 @@
+---
+
+  - name: Start role
+    debug:
+      msg: "########### INSTALL PACKER ###########"
+
+  - name: Packer - Create project dirs
+    file:
+      path: "{{project_dir}}/packer"
+      state: directory
+    loop:
+      - "{{project_dir}}/packer"
+      - "{{project_dir}}/packer/tf-templ-debian11"
+      - "{{project_dir}}/packer/tf-templ-ubuntu14"
+
+  - name: Packer - Extract packer binary file
+    unarchive:
+      src: "{{tf_packer_archive}}"
+      dest: "/usr/bin"
+
+  - name: Packer - copy all projects files
+    template:
+      src: "{{item.srcf}}"
+      dest: "{{project_dir}}/packer/{{item.dstf}}"
+    loop:
+      - { srcf: 'tf-templ-ubuntu14/preseed.cfg.j2', dstf: 'tf-templ-ubuntu14/preseed.cfg' }
+      - { srcf: 'tf-templ-ubuntu14/variables.pkr.hcl', dstf: 'tf-templ-ubuntu14/variables.pkr.hcl' }
+      - { srcf: 'tf-templ-ubuntu14/vars.auto.pkrvars.hcl.j2', dstf: 'tf-templ-ubuntu14/vars.auto.pkrvars.hcl' }
+      - { srcf: 'tf-templ-ubuntu14/vsphere-iso_basic_ubuntu.pkr.hcl.j2', dstf: 'tf-templ-ubuntu14/vsphere-iso_basic_ubuntu.pkr.hcl' }
+      - { srcf: 'tf-templ-debian11/preseed.cfg.j2', dstf: 'tf-templ-debian11/preseed.cfg' }
+      - { srcf: 'tf-templ-debian11/variables.pkr.hcl', dstf: 'tf-templ-debian11/variables.pkr.hcl' }
+      - { srcf: 'tf-templ-debian11/vars.auto.pkrvars.hcl.j2', dstf: 'tf-templ-debian11/vars.auto.pkrvars.hcl' }
+      - { srcf: 'tf-templ-debian11/vsphere-iso_basic_debian.pkr.hcl.j2', dstf: 'tf-templ-debian11/vsphere-iso_basic_debian.pkr.hcl' }
+
+  - name: Terraform - Create vm template debian
+    block:
+      - name: Packer - create template {{tf_packer_debian11_name}}, may take long time
+        shell: cd {{project_dir}}/packer/tf-templ-debian11/ && packer build .
+        register: output
+      - debug: var=output.stdout_lines
+    when: tf_packer_debian11 == true
+
+  - name: Terraform - Create vm template ubuntu
+    block:
+      - name: Packer - create template {{tf_packer_ubuntu14_name}}, may take long time
+        shell: cd {{project_dir}}/packer/tf-templ-ubuntu14/ && packer build .
+        register: output
+      - debug: var=output.stdout_lines
+    when: tf_packer_ubuntu14 == true
+
+
+
+

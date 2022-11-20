@@ -9,6 +9,7 @@
 #   become: yes
    vars_files:
      - "../group_vars/all.yml"
+     - "../../init-iac.yml"
    gather_facts: "{{facts | default('true')}}"
    roles:
      - '{{ ROLE }}'

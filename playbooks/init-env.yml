@@ -22,6 +22,7 @@
    connection: local
    roles:
      - '10-inst-terraform-vsphere'
+     - '10-inst-packer-vsphere'
 
  - hosts: 127.0.0.1
    vars_files:

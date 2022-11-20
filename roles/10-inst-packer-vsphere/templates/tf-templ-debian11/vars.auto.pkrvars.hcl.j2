@@ -7,5 +7,5 @@ cluster = "{{tf_cluster}}"
 {% else %}
 cluster = "{{tf_host}}"
 {% endif %}
-datastore = "{{tf_datastore}}"
-network_name = "{{tf_network_name}}"
+datastore = "{{tf_packer_dst_datastore}}"
+network_name = "{{tf_packer_dst_network}}"
