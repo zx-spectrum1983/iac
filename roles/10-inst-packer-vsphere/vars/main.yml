@@ -5,7 +5,7 @@ tf_packer_debian11               : true
 tf_packer_debian11_name          : "tf-templ-debian11"
 tf_packer_debian11_CPUs          : 1
 tf_packer_debian11_RAM           : 1024
-tf_packer_debian11_size          : 16384
+tf_packer_debian11_size          : 32768
 tf_packer_debian11_addition_pkgs : "git ansible mc"
 
 

@@ -49,7 +49,7 @@ resource "vsphere_virtual_machine" "vm" {
   memory   = each.value.memory
 
   network_interface {
-    network_id = data.vsphere_network.network.id
+    network_id = data.vsphere_network.network[each.value.name]["id"]
   }
 
   wait_for_guest_net_timeout = -1
@@ -61,7 +61,7 @@ resource "vsphere_virtual_machine" "vm" {
     size             = each.value.disk_size
   }
 
-  guest_id = "ubuntu64Guest"
+  guest_id = each.value.guest_id
 
   clone {
     template_uuid = data.vsphere_virtual_machine.template[each.value.name]["id"]

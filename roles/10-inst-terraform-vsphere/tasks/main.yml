@@ -13,6 +13,9 @@
     unarchive:
       src: "{{tf_terraform_archive}}"
       dest: "/usr/bin"
+    become: yes
+    become_method: sudo
+    become_user: root
 
   - name: Terraform - Create terraform plugins dir
     file:
@@ -32,6 +35,14 @@
       - { srcf: 'main.tf.j2', dstf: 'main.tf' }
       - { srcf: 'variables.tf.j2', dstf: 'variables.tf' }
       - { srcf: 'versions.tf', dstf: 'versions.tf' }
+
+  - name: Terraform - Change permisions
+    file:
+      path: "{{project_dir}}/terraform/variables.tf"
+      owner: ansible
+      group: root
+      mode: '600'
+    become: yes
 
   - name: Terraform - Init project
     shell: cd {{project_dir}}/terraform/ && terraform init -no-color

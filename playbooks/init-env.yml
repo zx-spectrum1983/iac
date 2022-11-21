@@ -5,7 +5,7 @@
      - "../../init-iac.yml"
    connection: local
    roles:
-     - '0-init-host'
+     - { role: '0-init-host', become: yes }
 
 # - hosts: vault
 #   vars_files:
@@ -24,12 +24,12 @@
      - '10-inst-terraform-vsphere'
      - '10-inst-packer-vsphere'
 
- - hosts: 127.0.0.1
-   vars_files:
-     - "../../init-iac.yml"
-     - "../group_vars/all.yml"
-   gather_facts: true
-   connection: local
-   roles:
-     - '10-inst-docker'
-     - '10-inst-gitlab'
+# - hosts: 127.0.0.1
+#   vars_files:
+#     - "../../init-iac.yml"
+#     - "../group_vars/all.yml"
+#   gather_facts: true
+#   connection: local
+#   roles:
+#     - '10-inst-docker'
+#     - '10-inst-gitlab'

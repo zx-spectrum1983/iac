@@ -6,7 +6,7 @@
 
   - name: Packer - Create project dirs
     file:
-      path: "{{project_dir}}/packer"
+      path: "{{item}}"
       state: directory
     loop:
       - "{{project_dir}}/packer"
@@ -17,6 +17,9 @@
     unarchive:
       src: "{{tf_packer_archive}}"
       dest: "/usr/bin"
+    become: yes
+    become_method: sudo
+    become_user: root
 
   - name: Packer - copy all projects files
     template:
@@ -32,7 +35,18 @@
       - { srcf: 'tf-templ-debian11/vars.auto.pkrvars.hcl.j2', dstf: 'tf-templ-debian11/vars.auto.pkrvars.hcl' }
       - { srcf: 'tf-templ-debian11/vsphere-iso_basic_debian.pkr.hcl.j2', dstf: 'tf-templ-debian11/vsphere-iso_basic_debian.pkr.hcl' }
 
-  - name: Terraform - Create vm template debian
+  - name: Packer - Change permisions
+    file:
+      path: "{{item}}"
+      owner: ansible
+      group: root
+      mode: '600'
+    loop:
+      - "{{project_dir}}/packer/tf-templ-ubuntu14/vars.auto.pkrvars.hcl"
+      - "{{project_dir}}/packer/tf-templ-debian11/vars.auto.pkrvars.hcl"
+    become: yes
+
+  - name: Packer - Create vm template debian
     block:
       - name: Packer - create template {{tf_packer_debian11_name}}, may take long time
         shell: cd {{project_dir}}/packer/tf-templ-debian11/ && packer build .
@@ -40,7 +54,7 @@
       - debug: var=output.stdout_lines
     when: tf_packer_debian11 == true
 
-  - name: Terraform - Create vm template ubuntu
+  - name: Packer - Create vm template ubuntu
     block:
       - name: Packer - create template {{tf_packer_ubuntu14_name}}, may take long time
         shell: cd {{project_dir}}/packer/tf-templ-ubuntu14/ && packer build .
