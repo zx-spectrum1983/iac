@@ -1,0 +1,17 @@
+[dev]
+[stage]
+[prod]
+
+[stage_env:children]
+dev
+stage
+prod
+
+[stage_env:vars]
+tf_cpu_count=1
+tf_memory=1024
+tf_datastore="datastore3"
+tf_disk_size=32
+tf_network="VM Network"
+tf_template="tf-templ-debian11"
+tf_guest_id="debian10_64Guest"

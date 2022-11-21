@@ -1,0 +1,15 @@
+[docker_test]
+[infra_test]
+
+[test_env:children]
+docker_test
+infra_test
+
+[test_env:vars]
+tf_cpu_count=1
+tf_memory=1024
+tf_datastore="datastore2"
+tf_disk_size=16
+tf_network="VM Network"
+tf_template="tf-templ-ubuntu14"
+tf_guest_id="ubuntu64Guest"

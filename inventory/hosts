@@ -1,0 +1,14 @@
+[all]
+
+[local]
+localhost ansible_connection=local
+
+[infra_test]
+pod01-vm1-tst1 tf_datastore="datastore1"
+pod01-vm2-tst2
+
+[stage]
+pod02-vm1-prl1
+
+[prod]
+pod02-vm2-prl2
