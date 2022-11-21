@@ -1,0 +1,30 @@
+---
+
+
+  - name: Sync - Create .pln.tf file
+    copy:
+      dest: "{{project_dir}}/terraform/{{sync_env_list_item}}.pln.tf"
+      content: |
+        locals {
+          {{sync_env_list_item}} = merge(var.{{sync_env_list_item}}-empty,)
+          }
+
+  - name: Sync - Create groups in envoriment
+    include_tasks: "insert-group.yml"
+    when: (sync_group_list.stdout | from_json)[sync_env_list_item].children is defined
+    loop: "{{(sync_group_list.stdout | from_json)[sync_env_list_item].children}}"
+    loop_control:
+      loop_var: sync_group_list_item
+
+
+  - name: Sync-create - Add empty group
+    blockinfile:
+      path: "{{project_dir}}/terraform/{{sync_env_list_item}}.pln.tf"
+      marker: ""
+      insertafter: EOF
+      block: |
+        variable "{{sync_env_list_item}}-empty" {
+          type = map
+          default = {}
+          }
+

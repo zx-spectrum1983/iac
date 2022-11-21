@@ -1,0 +1,29 @@
+---
+
+  - name: Sync - add group to locals
+    replace:
+      path: "{{project_dir}}/terraform/{{sync_env_list_item}}.pln.tf"
+      regexp: '(.*merge)\((var.*)?$'
+      replace: '\1(var.{{sync_group_list_item}}, \2'
+
+
+  - name: Sync - insert block in env file
+    blockinfile:
+      path: "{{project_dir}}/terraform/{{sync_env_list_item}}.pln.tf"
+      marker: ""
+      insertafter: EOF
+      block: |
+        variable "{{sync_group_list_item}}" {
+          type = map
+          default = {
+            }
+          }
+
+  - name: Sync - insert hosts to group {{sync_group_list_item}}
+    include_tasks: "insert-hosts.yml"
+    when: (sync_group_list.stdout | from_json)[sync_group_list_item].hosts is defined
+    loop: "{{(sync_group_list.stdout | from_json)[sync_group_list_item].hosts}}"
+    loop_control:
+      loop_var: sync_hosts_list_item
+
+

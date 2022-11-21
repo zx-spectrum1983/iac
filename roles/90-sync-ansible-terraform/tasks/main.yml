@@ -1,0 +1,41 @@
+---
+
+  - name: Sync - check inventory
+    shell: ansible-inventory --list 2>&1 | { grep WARNING || true; }
+    register: inventory_status
+
+#  - fail:
+#      msg: "Inventory has some warnings. Run 'ansible-inventory --list' for details. {{inventory_status.stdout}}"
+#    when: inventory_status.stdout != ""
+  - debug:
+      msg="{{inventory_status.stdout}}"
+
+
+  - name: Sync - get env list from ansible
+    shell: "ls {{inventory_envoriments_dir}}"
+    register: sync_env_list
+
+  - name: Sync - get list of groups in envoriment
+    shell: "cd {{git_project_dir}} && ansible-inventory --list"
+    register: sync_group_list
+
+  - name: Sync - get env list from terraform
+    find:
+      paths: "{{project_dir}}/terraform"
+      patterns: "*.pln.tf"
+    register: sync_tf_list
+
+  - name: Sync - Clear previous plan
+    file:
+      path: "{{ item.path }}"
+      state: absent
+    with_items: "{{sync_tf_list.files}}"
+
+  - name: Sync - create env if not exist
+    include_tasks: "insert-env.yml"
+    when: sync_env_list.stdout != ""
+    loop: "{{sync_env_list.stdout_lines}}"
+    loop_control:
+      loop_var: sync_env_list_item
+
+
