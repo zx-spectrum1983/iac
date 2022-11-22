@@ -38,4 +38,12 @@
     loop_control:
       loop_var: sync_env_list_item
 
+  - name: Sync - terraform plan
+    shell: cd {{project_dir}}/terraform && terraform plan -no-color
+    register: output
+  - debug: var=output.stdout_lines
 
+  - name: Sync - terraform apply
+    shell: cd {{project_dir}}/terraform && terraform apply -auto-approve -no-color
+    register: output
+  - debug: var=output.stdout_lines

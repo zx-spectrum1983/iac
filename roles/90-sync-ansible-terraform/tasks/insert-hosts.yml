@@ -13,7 +13,7 @@
     lineinfile:
       path: "{{project_dir}}/terraform/{{sync_env_list_item}}.pln.tf"
       insertafter: '(.*)default(.*)$'
-      line: "    {{sync_hosts_list_item}} ={name=\"{{sync_hosts_list_item}}\",}"
+      line: "    {{sync_hosts_list_item}} ={tf_name=\"{{sync_hosts_list_item}}\",}"
 
   - name: Sync - insert hosts properties {{sync_hosts_list_item}}
     replace:
