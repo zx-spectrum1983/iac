@@ -15,12 +15,12 @@ def get_config():
       vaultJson = json.loads(response.text)
       ft.close()
       try:
-         data['all']['vars'] = vaultJson['data']
+         data['local']['vars'] = vaultJson['data']
       except KeyError:
          isExistT = False
          get_config()
       else:
-         data['all']['vars'] = vaultJson['data']
+         data['local']['vars'] = vaultJson['data']
          print(json.dumps(data, indent=4))
          return
    elif isExistC:
@@ -34,7 +34,7 @@ def get_config():
    return
 
 
-varsJson = '{"all":{"vars":{}}}'
+varsJson = '{"local":{"vars":{}}}'
 data = json.loads(varsJson)
 
 tokenfile = "/home/ansible/.vault_ansible_token"
