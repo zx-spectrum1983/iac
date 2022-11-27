@@ -1,26 +1,12 @@
 ---
 
-# - hosts: 127.0.0.1
-#   connection: local
-#   roles:
-#     - { role: '0-init-host', become: yes }
-
  - hosts: 127.0.0.1
    gather_facts: true
    connection: local
    roles:
+#     - { role: '0-init-host', become: yes }
 #     - '10-inst-docker'
-     - '10-inst-vault'
-
-# - hosts: 127.0.0.1
-#   connection: local
-#   roles:
-#     - '10-inst-terraform-vsphere'
+#     - '10-inst-vault'
 #     - '10-inst-packer-vsphere'
-
-# - hosts: 127.0.0.1
-#   gather_facts: true
-#   connection: local
-#   roles:
-#     - '10-inst-docker'
+#     - '10-inst-terraform-vsphere'
 #     - '10-inst-gitlab'
