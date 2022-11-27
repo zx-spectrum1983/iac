@@ -27,30 +27,33 @@
       dest: "{{project_dir}}/packer/{{item.dstf}}"
     loop:
       - { srcf: 'tf-templ-ubuntu14/preseed.cfg.j2', dstf: 'tf-templ-ubuntu14/preseed.cfg' }
-      - { srcf: 'tf-templ-ubuntu14/variables.pkr.hcl', dstf: 'tf-templ-ubuntu14/variables.pkr.hcl' }
-      - { srcf: 'tf-templ-ubuntu14/vars.auto.pkrvars.hcl.j2', dstf: 'tf-templ-ubuntu14/vars.auto.pkrvars.hcl' }
+      - { srcf: 'tf-templ-ubuntu14/variables.pkr.hcl.j2', dstf: 'tf-templ-ubuntu14/variables.pkr.hcl' }
+#      - { srcf: 'tf-templ-ubuntu14/vars.auto.pkrvars.hcl.j2', dstf: 'tf-templ-ubuntu14/vars.auto.pkrvars.hcl' }
       - { srcf: 'tf-templ-ubuntu14/vsphere-iso_basic_ubuntu.pkr.hcl.j2', dstf: 'tf-templ-ubuntu14/vsphere-iso_basic_ubuntu.pkr.hcl' }
       - { srcf: 'tf-templ-debian11/preseed.cfg.j2', dstf: 'tf-templ-debian11/preseed.cfg' }
-      - { srcf: 'tf-templ-debian11/variables.pkr.hcl', dstf: 'tf-templ-debian11/variables.pkr.hcl' }
-      - { srcf: 'tf-templ-debian11/vars.auto.pkrvars.hcl.j2', dstf: 'tf-templ-debian11/vars.auto.pkrvars.hcl' }
+      - { srcf: 'tf-templ-debian11/variables.pkr.hcl.j2', dstf: 'tf-templ-debian11/variables.pkr.hcl' }
+#      - { srcf: 'tf-templ-debian11/vars.auto.pkrvars.hcl.j2', dstf: 'tf-templ-debian11/vars.auto.pkrvars.hcl' }
       - { srcf: 'tf-templ-debian11/vsphere-iso_basic_debian.pkr.hcl.j2', dstf: 'tf-templ-debian11/vsphere-iso_basic_debian.pkr.hcl' }
 
-  - name: Packer - Change permisions
-    file:
-      path: "{{item}}"
-      owner: ansible
-      group: root
-      mode: '600'
-    loop:
-      - "{{project_dir}}/packer/tf-templ-ubuntu14/vars.auto.pkrvars.hcl"
-      - "{{project_dir}}/packer/tf-templ-debian11/vars.auto.pkrvars.hcl"
-    become: yes
+#  - name: Packer - Change permisions
+#    file:
+#      path: "{{item}}"
+#      owner: ansible
+#      group: root
+#      mode: '600'
+#    loop:
+#      - "{{project_dir}}/packer/tf-templ-ubuntu14/vars.auto.pkrvars.hcl"
+#      - "{{project_dir}}/packer/tf-templ-debian11/vars.auto.pkrvars.hcl"
+#    become: yes
 
   - name: Packer - Create vm template debian
     block:
       - name: Packer - create template {{tf_packer_debian11_name}}, may take long time
         shell: cd {{project_dir}}/packer/tf-templ-debian11/ && packer build .
         register: output
+        environment:
+          VAULT_ADDR: "http://127.0.0.1:8200"
+          VAULT_TOKEN: "{{ lookup('file', '/home/ansible/.vault_ansible_token') }}"
       - debug: var=output.stdout_lines
     when: tf_packer_debian11 == true
 
@@ -59,6 +62,9 @@
       - name: Packer - create template {{tf_packer_ubuntu14_name}}, may take long time
         shell: cd {{project_dir}}/packer/tf-templ-ubuntu14/ && packer build .
         register: output
+        environment:
+          VAULT_ADDR: "http://127.0.0.1:8200"
+          VAULT_TOKEN: "{{ lookup('file', '/home/ansible/.vault_ansible_token') }}"
       - debug: var=output.stdout_lines
     when: tf_packer_ubuntu14 == true
 

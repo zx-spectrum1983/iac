@@ -1,9 +1,9 @@
 source "vsphere-iso" "this" {
-  vcenter_server    = var.vsphere_server
-  username          = var.vsphere_user
-  password          = var.vsphere_password
-  datacenter        = var.datacenter
-  cluster           = var.cluster
+  vcenter_server    = local.vsphere_server
+  username          = local.vsphere_user
+  password          = local.vsphere_password
+  datacenter        = local.datacenter
+  cluster           = local.cluster
   insecure_connection  = true
 
   vm_name = "{{tf_packer_ubuntu14_name}}"
@@ -17,7 +17,7 @@ source "vsphere-iso" "this" {
   RAM_reserve_all = true
 
   disk_controller_type =  ["pvscsi"]
-  datastore = var.datastore
+  datastore = local.datastore
   storage {
     disk_size =        {{tf_packer_ubuntu14_size}}
     disk_thin_provisioned = true
@@ -27,7 +27,7 @@ source "vsphere-iso" "this" {
   // iso_checksum = "sha256:b23488689e16cad7a269eb2d3a3bf725d3457ee6b0868e00c8762d3816e25848"
 
   network_adapters {
-    network =  var.network_name
+    network =  local.network_name
     network_card = "vmxnet3"
   }
 
