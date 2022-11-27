@@ -1,3 +1,11 @@
+provider "vault" {
+  address = "http://127.0.0.1:8200"
+  token = file("/home/ansible/.vault_ansible_token")
+}
+
+data "vault_generic_secret" "config"{
+  path = "ansible/config"
+}
 
 provider "vsphere" {
   vsphere_server = local.vsphere_server
@@ -75,16 +83,16 @@ resource "vsphere_virtual_machine" "vm" {
       "sudo hostnamectl set-hostname ${each.value.tf_name}",
       "sudo sed -i 's/${each.value.tf_template}/${each.value.tf_name}/g' /etc/hosts",
       "sudo pkill dhclient && sudo /sbin/dhclient -4",
-      "mkdir /home/{{tf_packer_init_ssh_username}}/.ssh && touch /home/{{tf_packer_init_ssh_username}}/.ssh/authorized_keys",
-      "chmod 700 /home/{{tf_packer_init_ssh_username}}/.ssh && chmod 600 /home/{{tf_packer_init_ssh_username}}/.ssh/authorized_keys",
-      "cat /tmp/id_rsa.pub >> /home/{{tf_packer_init_ssh_username}}/.ssh/authorized_keys",
+      "mkdir /home/${data.vault_generic_secret.config.data["tf_packer_init_ssh_username"]}/.ssh && touch /home/${data.vault_generic_secret.config.data["tf_packer_init_ssh_username"]}/.ssh/authorized_keys",
+      "chmod 700 /home/${data.vault_generic_secret.config.data["tf_packer_init_ssh_username"]}/.ssh && chmod 600 /home/${data.vault_generic_secret.config.data["tf_packer_init_ssh_username"]}/.ssh/authorized_keys",
+      "cat /tmp/id_rsa.pub >> /home/${data.vault_generic_secret.config.data["tf_packer_init_ssh_username"]}/.ssh/authorized_keys",
     ]
   }
   connection {
     type = "ssh"
     host = "${self.guest_ip_addresses[0]}"
-    user = "{{tf_packer_init_ssh_username}}"
-    password = "{{tf_packer_init_ssh_password}}"
+    user = "${data.vault_generic_secret.config.data["tf_packer_init_ssh_username"]}"
+    password = "${data.vault_generic_secret.config.data["tf_packer_init_ssh_password"]}"
     port = "22"
     agent = false
     }
