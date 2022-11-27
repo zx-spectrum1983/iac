@@ -9,23 +9,25 @@
       path: "{{project_dir}}/terraform"
       state: directory
 
+  - name: Terraform - Create plugins dirs structure
+    file:
+      path: "~/.terraform.d/plugins/registry.terraform.io/{{item.source}}/{{item.version}}/linux_amd64/"
+      state: directory
+    loop: "{{tf_provider}}"
+
   - name: Terraform - Extract terraform binary file
     unarchive:
-      src: "{{tf_terraform_archive}}"
+      src: "{{tf_terraform.arch}}"
       dest: "/usr/bin"
     become: yes
     become_method: sudo
     become_user: root
 
-  - name: Terraform - Create terraform plugins dir
-    file:
-      path: "~/.terraform.d"
-      state: directory
-
-  - name: Terraform - Extract vsphere provider
+  - name: Terraform - Extract providers
     unarchive:
-      src: "{{tf_provider_archive}}"
-      dest: "~/.terraform.d"
+      src: "{{item.arch}}"
+      dest: "~/.terraform.d/plugins/registry.terraform.io/{{item.source}}/{{item.version}}/linux_amd64/"
+    loop: "{{tf_provider}}"
 
   - name: Terraform - Copy project files
     template:
@@ -34,7 +36,7 @@
     loop:
       - { srcf: 'main.tf.j2', dstf: 'main.tf' }
       - { srcf: 'variables.tf.j2', dstf: 'variables.tf' }
-      - { srcf: 'versions.tf', dstf: 'versions.tf' }
+      - { srcf: 'versions.tf.j2', dstf: 'versions.tf' }
       - { srcf: 'output.tf', dstf: 'output.tf' }
 
   - name: Terraform - Change permisions

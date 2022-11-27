@@ -1,0 +1,10 @@
+terraform {
+  required_providers {
+{% for item in tf_provider %}
+    {{ item['name'] }} = {
+      source  = "{{ item['source'] }}"
+      version = "{{ item['version'] }}"
+    }
+{% endfor %}
+  }
+}
