@@ -26,7 +26,7 @@ def get_config():
    elif isExistC:
       ft = open(configfile)
       configJson = json.load(ft)
-      data['all']['vars'] = configJson
+      data['local']['vars'] = configJson
       print(json.dumps(data, indent=4))
       ft.close()
    else:
