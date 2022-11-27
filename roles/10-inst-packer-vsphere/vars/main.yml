@@ -1,5 +1,5 @@
 
-tf_packer_archive                : "packer_1.8.1_linux_amd64.zip"
+tf_packer_archive                : "packer_1.8.4_linux_amd64.zip"
 
 tf_packer_debian11_name          : "tf-templ-debian11"
 tf_packer_debian11_CPUs          : 1
