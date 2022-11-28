@@ -46,13 +46,27 @@
       shell: sudo cat {{project_dir}}/gitlab/etc/gitlab/initial_root_password | grep "Password:" | awk '{print $2}'
       register: gitlab_root_pass
 
-    - local_action: copy content={{ gitlab_root_pass.stdout }} dest="/home/ansible/gitlab_root_password"
+#    - local_action: copy content={{ gitlab_root_pass.stdout }} dest="/home/ansible/gitlab_root_password"
+    - name: Gitlab deploy - save root password to vault
+      include_role:
+        name: 90-sync-vault
+      vars:
+        vault_argument: "append"
+        vault_key: "gitlab_root_password"
+        vault_value: "{{gitlab_root_pass.stdout}}"
 
     - name: Gitlab deploy - Generate access token
       shell: openssl rand -hex 20
       register: gitlab_token
 
-    - local_action: copy content={{ gitlab_token.stdout }} dest="/home/ansible/gitlab_token"
+#    - local_action: copy content={{ gitlab_token.stdout }} dest="/home/ansible/gitlab_token"
+    - name: Gitlab deploy - save token to vault
+      include_role:
+        name: 90-sync-vault
+      vars:
+        vault_argument: "append"
+        vault_key: "gitlab_token"
+        vault_value: "{{gitlab_token.stdout}}"
 
     - name: Gitlab deploy - Create new gitlab user (waiting...)
       shell: |
