@@ -1,11 +1,24 @@
 ---
 
-  - name: Check if engine exists
+  - name: Vault - Wait for building project (take few minutes...)
+    uri:
+      url: "http://127.0.0.1:8200/v1/sys/health"
+      method: GET
+      status_code: 200
+    register: _result
+    until: _result.status == 200
+    retries: 60
+    delay: 10
+
+  - name: Vault - Check if engine exists
     uri:
       url: http://127.0.0.1:8200/v1/sys/mounts
       headers:
         X-Vault-Token: "{{vault_token.stdout}}"
     register: outputjson
+    until: outputjson.status == 200
+    retries: 10
+    delay: 10
 
   - debug: var=outputjson['json']['{{vault_engine_name}}/']
 
