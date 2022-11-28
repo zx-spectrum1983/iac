@@ -1,0 +1,56 @@
+---
+
+  - set_fact: vault_argument="list"
+    when: vault_argument is undefined
+
+  - set_fact: vault_key=""
+    when: vault_key is undefined
+
+  - set_fact: vault_value=""
+    when: vault_value is undefined
+
+  - name: Vault-sync - get json data from vault
+    uri:
+      url: "http://127.0.0.1:8200/v1/{{vault_engine_name}}/config"
+      headers:
+        X-Vault-Token: "{{(lookup('file', '/home/ansible/.vault_ansible_token'))}}"
+    register: outputjson
+
+  - debug: var=outputjson['json']['data']
+
+  - name: Vault-sync - append key-value to json
+    set_fact:
+      vaultJsonAppend: "{{ outputjson['json']['data'] | combine( { vault_key: vault_value } ) }}"
+    when: vault_argument == "append"
+
+  - set_fact:
+      vaultJsonRemove: {}
+
+  - name: Vault-sync - remove key-value from json
+    set_fact:
+      vaultJsonRemove: "{{ vaultJsonRemove | combine({item.key: item.value})}}"
+    when: "{{item.key not in [vault_key]}}"
+    with_dict: "{{outputjson['json']['data']}}"
+
+  - set_fact:
+      vaultJson: "{% if vault_argument=='append' %}{{vaultJsonAppend}}{% elif vault_argument=='remove' %}{{vaultJsonRemove}}{% endif %}"
+
+#  - debug: var=vaultJson
+
+#  - debug: var=outputjson['json']['data']
+
+  - debug: var=vaultJson
+
+  - name: Vault-sync - set json data to vault
+    uri:
+      url: "http://127.0.0.1:8200/v1/{{vault_engine_name}}/config"
+      method: POST
+      headers:
+        X-Vault-Token: "{{(lookup('file', '/home/ansible/.vault_ansible_token'))}}"
+#        Content-Type: "application/merge-patch+json"
+      body: "{{vaultJson}}"
+      body_format: json
+      status_code: 204
+    when: vault_argument == "append" or vault_argument == "remove"
+
+
