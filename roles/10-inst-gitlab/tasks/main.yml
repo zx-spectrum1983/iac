@@ -27,6 +27,7 @@
     - name: Gitlab deploy - Up project
       shell: cd {{project_dir}}/gitlab && docker-compose up -d
       register: output
+      become: yes
 
     - debug:
         var: output.stderr_lines
@@ -55,11 +56,11 @@
 
     - name: Gitlab deploy - Create new gitlab user (waiting...)
       shell: |
-        docker exec -i gitlab-ce bash -c "gitlab-rails runner \"u = User.new(username: '{{gitlab_username}}', email: '{{gitlab_email}}', name: '{{gitlab_username}}', password: '{{gitlab_password}}', password_confirmation: '{{gitlab_password}}'); u.skip_confirmation! ; u.save! \""
+        sudo docker exec -i gitlab-ce bash -c "gitlab-rails runner \"u = User.new(username: '{{gitlab_username}}', email: '{{gitlab_email}}', name: '{{gitlab_username}}', password: '{{gitlab_password}}', password_confirmation: '{{gitlab_password}}'); u.skip_confirmation! ; u.save! \""
 
     - name: Gitlab deploy - Create token (waiting...)
       shell: |
-        docker exec -i gitlab-ce bash -c "gitlab-rails runner \"token = User.find_by_username('{{gitlab_username}}').personal_access_tokens.create(scopes: [:read_user, :api, :read_api, :sudo], name: 'ansible-token'); token.set_token('{{gitlab_token.stdout}}'); token.save! \""
+        sudo docker exec -i gitlab-ce bash -c "gitlab-rails runner \"token = User.find_by_username('{{gitlab_username}}').personal_access_tokens.create(scopes: [:read_user, :api, :read_api, :sudo], name: 'ansible-token'); token.set_token('{{gitlab_token.stdout}}'); token.save! \""
 
     - name: Gitlab deploy - switch git repo to local server
       shell: |
