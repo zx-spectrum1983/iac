@@ -1,6 +1,9 @@
-Установка тестировалась на Debian 11
+Test stand:
+- vSphere 6.7
+- External DNS/DHCP server
+- Debian 11
 
-<h2> Установка </h2>
+<h2> Installation </h2>
 
 ```
 create new VM with ansible user
@@ -15,35 +18,46 @@ create new VM with ansible user
 # ansible-playbook playbooks/init-env.yml
 ```
 
-<h2>Содержимое файла init-iac.yml</h2>
+<h2>Content of /home/ansible/init-iac.json</h2>
 
 ```
-init_ansible_password            : ansible
-project_dir                      : "/opt"
+{
+  "Comment": "IAC settings",
 
-# Terraform & packer connection
-tf_vsphere_server                : "vcenter.vsphere.local"
-tf_vsphere_user                  : "administrator@vsphere.local"
-tf_vsphere_password              : "vcenter_password"
-tf_datacenter                    : "dc"
-tf_cluster                       : ""
-tf_host                          : "192.168.1.100"
-tf_datastore                     : "datastore1"
-tf_network_name                  : "VM Network"
+  "git_project_dir": "/home/ansible/iac",
+  "project_dir": "/home/ansible/project",
+  "inventory_envoriments_dir": "/home/ansible/iac/inventory/envoriments",
 
-# Packer template settings
-# Before run script you must upload ubuntu-14.04.1-server-amd64.iso to datastore/iso
-tf_vm_template                   : true
-tf_vm_template_name              : "tf-templ-ubuntu"
-tf_vm_template_ssh_username      : "ansible"
-tf_vm_template_ssh_password      : "ansible"
-tf_vm_template_iso_path          : "[datastore1] iso/ubuntu-14.04.1-server-amd64.iso"
-tf_vm_template_guest_os_type     : "ubuntu64Guest"
-tf_vm_template_CPUs              : 1
-tf_vm_template_RAM               : 1024
-tf_vm_template_disk_size         : 16384
-tf_vm_template_disk_thin         : "true"
-tf_vm_template_addition_pkgs     : "git ansible"
-tf_vm_template_ssh_key           : "/home/ansible/.ssh/id_rsa.pub"
+  "Comment": "Terraform & packer connection",
+
+  "tf_vsphere_server": "vcenter.vcloud.local",
+  "tf_vsphere_user": "administrator@vcloud.local",
+  "tf_vsphere_password": "vsphere_password",
+  "tf_datacenter": "dc",
+  "tf_cluster": "",
+  "tf_host": "192.168.1.100",
+
+  "Comment": "Packer template settings",
+
+  "tf_packer_debian11": true,
+  "tf_packer_ubuntu14": true,
+  "tf_packer_init_ssh_username": "ansible",
+  "tf_packer_init_ssh_password": "ansible",
+  "tf_packer_dst_datastore": "datastore1",
+  "tf_packer_dst_network": "VM Network",
+  "tf_packer_ubuntu14_iso_path": "[datastore1] iso/ubuntu-14.04.1-server-amd64.iso",
+  "tf_packer_debian11_iso_path": "[datastore1] iso/debian-11.5.0-amd64-netinst.iso",
+
+  "Comment": "Gitlab settings",
+
+  "gitlab_username": "ansible",
+  "gitlab_password": "ansible_",
+  "gitlab_email": "ansible@vcloud.local",
+
+  "Comment": "Vault settings",
+
+  "vault_engine_init": true,
+  "vault_engine_name": "ansible"
+}
 ```
 
