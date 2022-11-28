@@ -4,9 +4,9 @@
    gather_facts: true
    connection: local
    roles:
-#     - { role: '0-init-host', become: yes }
-#     - '10-inst-docker'
-#     - '10-inst-vault'
+     - { role: '0-init-host', become: yes }
+     - '10-inst-docker'
+     - '10-inst-vault'
      - '10-inst-packer-vsphere'
-#     - '10-inst-terraform-vsphere'
-#     - '10-inst-gitlab'
+     - '10-inst-terraform-vsphere'
+     - '10-inst-gitlab'
