@@ -43,7 +43,7 @@
       delay: 10
 
     - name: Gitlab deploy - Get root password
-      shell: cat {{project_dir}}/gitlab/etc/gitlab/initial_root_password | grep "Password:" | awk '{print $2}'
+      shell: sudo cat {{project_dir}}/gitlab/etc/gitlab/initial_root_password | grep "Password:" | awk '{print $2}'
       register: gitlab_root_pass
 
     - local_action: copy content={{ gitlab_root_pass.stdout }} dest="/home/ansible/gitlab_root_password"
