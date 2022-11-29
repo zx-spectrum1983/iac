@@ -95,6 +95,7 @@
         shell: /bin/bash
         createhome: yes
         home: /home/gitlab-runner
+        skeleton: false
       become: yes
 
     - name: Gitlab deploy - install gitlab-runner
