@@ -1,0 +1,13 @@
+stages:
+  - build
+  - test
+  - delivery
+  - deploy
+
+build-job:
+  stage: build
+  tags:
+    - iac-runner
+  script:
+    - echo "Start build job"
+    - ansible-playbook -l local playbooks/play-role.yml -e "ROLE=90-sync-ansible-terraform facts=true"
