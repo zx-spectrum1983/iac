@@ -95,7 +95,7 @@
 
     - name: Gitlab deploy - register gitlab-runner
       shell: |
-        sudo gitlab-runner register --non-interactive --url http://{{ansible_default_ipv4.address}}:8000/ --registration-token "{{gitlab_runner_token.stdout}}" --executor shell
+        sudo gitlab-runner register --non-interactive --url http://{{ansible_default_ipv4.address}}:8000/ --registration-token "{{gitlab_runner_token.stdout}}" --executor shell --tag-list iac-runner --run-untagged=false
         sudo gitlab-runner verify
       register: output
 
