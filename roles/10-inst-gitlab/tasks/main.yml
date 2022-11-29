@@ -88,14 +88,26 @@
         mode: '0555'
       become: yes
 
+    - name: Gitlab deploy - create user gitlab-runner
+      user:
+        name: gitlab-runner
+        state: present
+        shell: /bin/bash
+        createhome: yes
+        home: /home/gitlab-runner
+      become: yes
+
     - name: Gitlab deploy - install gitlab-runner
       shell: |
-        sudo gitlab-runner install --user=ansible --working-directory={{git_project_dir}}
-        sudo gitlab-runner start
+        sudo gitlab-runner install --user=gitlab-runner --working-directory=/home/gitlab-runner
+
+
+####        sudo gitlab-runner start
 
     - name: Gitlab deploy - register gitlab-runner
       shell: |
-        sudo gitlab-runner register --non-interactive --url http://{{ansible_default_ipv4.address}}:8000/ --registration-token "{{gitlab_runner_token.stdout}}" --executor shell --tag-list iac-runner --run-untagged=false
+        sudo gitlab-runner register --non-interactive --url http://{{ansible_default_ipv4.address}}:8000/ --registration-token "{{gitlab_runner_token.stdout}}" --executor shell --tag-list iac-runner --run-untagged=true
+        sudo gitlab-runner start
         sudo gitlab-runner verify
       register: output
 
