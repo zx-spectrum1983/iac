@@ -76,6 +76,31 @@
       shell: |
         sudo docker exec -i gitlab-ce bash -c "gitlab-rails runner \"token = User.find_by_username('{{gitlab_username}}').personal_access_tokens.create(scopes: [:read_user, :api, :read_api, :sudo], name: 'ansible-token'); token.set_token('{{gitlab_token.stdout}}'); token.save! \""
 
+    - name: Gitlab deploy - Get runner token
+      shell: |
+        sudo docker exec -i gitlab-ce bash -c "gitlab-rails runner 'puts Gitlab::CurrentSettings.current_application_settings.runners_registration_token'"
+      register: gitlab_runner_token
+
+    - name: Gitlab deploy - download gitlab-runner
+      get_url:
+        url: https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64
+        dest: /usr/local/bin/gitlab-runner
+        mode: '0555'
+      become: yes
+
+    - name: Gitlab deploy - install gitlab-runner
+      shell: |
+        sudo gitlab-runner install --user=ansible --working-directory={{git_project_dir}}
+        sudo gitlab-runner start
+
+    - name: Gitlab deploy - register gitlab-runner
+      shell: |
+        sudo gitlab-runner register --non-interactive --url http://{{ansible_default_ipv4.address}}:8000/ --registration-token "{{gitlab_runner_token.stdout}}" --executor shell
+        sudo gitlab-runner verify
+      register: output
+
+    - debug: var=output
+
     - name: Gitlab deploy - switch git repo to local server
       shell: |
         cd /home/ansible/iac
