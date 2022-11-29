@@ -4,17 +4,17 @@
     debug:
       msg: "########### INSTALL VAULT IN DOCKER ###########"
 
-  - name: Vault - Install essentials
-    apt:
-      pkg:
-        - python3-pip
-    become: yes
+#  - name: Vault - Install essentials
+#    apt:
+#      pkg:
+#        - python3-pip
+#    become: yes
 
-  - name: Vault - Instal python module hvac
-    pip:
-      name: hvac
-      state: present
-    become: yes
+#  - name: Vault - Instal python module hvac
+#    pip:
+#      name: hvac
+#      state: present
+#    become: yes
 
   - name: Vault - Create compose project dir
     file:
