@@ -97,7 +97,6 @@
       user:
         name: gitlab-runner
         groups:
-         - gitlab-runner
          - "{{ansible_user_id}}"
          - sudo
         state: present

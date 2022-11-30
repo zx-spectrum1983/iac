@@ -4,6 +4,7 @@
 # ansible-playbook -l <group_from_inventory> playbooks/play-role.yml -e "ROLE=<xx-name-role> facts=false" --check
 # ansible-playbook --connection=local --inventory 127.0.0.1, playbooks/play-role.yml -e "ROLE=xx-name-role facts=false" --check
 # ansible-playbook -l local playbooks/play-role.yml -e "ROLE=90-sync-ansible-terraform facts=true"
+# ansible-playbook -l local playbooks/play-role.yml -e "ROLE=90-sync-vault facts=true vault_argument=remove vault_key=gitlab_token"
 
  - hosts: all
 #   remote_user: ansible
