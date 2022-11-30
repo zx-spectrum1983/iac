@@ -106,6 +106,27 @@
         skeleton: false
       become: yes
 
+    - name: Gitlab deploy - create .ssh dir for user gitlab-runner
+      file:
+        path: "/home/gitlab-runner/.ssh"
+        state: directory
+        owner: gitlab-runner
+        group: gitlab-runner
+        mode: '0700'
+      become: yes
+
+    - name: Gitlab deploy - copy ssh keys to user gitlab-runner
+      copy:
+        src: "/home/{{ansible_user_id}}/.ssh/{{item.fn}}"
+        dest: "/home/gitlab-runner/.ssh/{{item.fn}}"
+        owner: gitlab-runner
+        group: gitlab-runner
+        mode: '{{item.md}}'
+      loop:
+        - { fn: 'id_rsa', md: '0600' }
+        - { fn: 'id_rsa.pub', md: '0644' }
+      become: yes
+
     - name: Gitlab deploy - install gitlab-runner
       shell: |
         sudo gitlab-runner install --user=gitlab-runner --working-directory=/home/gitlab-runner
