@@ -1,12 +1,12 @@
 locals {
-  vsphere_server = vault("ansible/config", "tf_vsphere_server")
-  vsphere_user = vault("ansible/config", "tf_vsphere_user")
-  vsphere_password = vault("ansible/config", "tf_vsphere_password")
-  datacenter = vault("ansible/config", "tf_datacenter")
+  vsphere_server = vault("ansible/cloud", "tf_vsphere_server")
+  vsphere_user = vault("ansible/cloud", "tf_vsphere_user")
+  vsphere_password = vault("ansible/cloud", "tf_vsphere_password")
+  datacenter = vault("ansible/cloud", "tf_datacenter")
 {% if tf_cluster is defined and tf_cluster|length %}
-  cluster = vault("ansible/config", "tf_cluster")
+  cluster = vault("ansible/cloud", "tf_cluster")
 {% else %}
-  cluster = vault("ansible/config", "tf_host")
+  cluster = vault("ansible/cloud", "tf_host")
 {% endif %}
   datastore = vault("ansible/config", "tf_packer_dst_datastore")
   network_name = vault("ansible/config", "tf_packer_dst_network")

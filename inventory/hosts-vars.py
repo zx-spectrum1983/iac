@@ -62,14 +62,23 @@ data = json.loads(varsJson)
 
 tokenfile = "/etc/vault/.vault_ansible_token"
 configfile = os.path.expanduser("~")+"/init-iac.json"
+icloudfile = os.path.expanduser("~")+"/init-cloud.json"
 
 isExistT = os.path.exists(tokenfile)
 isExistC = os.path.exists(configfile)
+isExistI = os.path.exists(icloudfile)
 
 if isExistC:
    ft = open(configfile)
    configJson = json.load(ft)
    data['local']['vars'] = configJson
+   ft.close()
+
+if isExistI:
+   ft = open(icloudfile)
+   cloudJson = json.load(ft)
+   for key in cloudJson:
+      data['local']['vars'][key] = cloudJson[key]
    ft.close()
 
 try:

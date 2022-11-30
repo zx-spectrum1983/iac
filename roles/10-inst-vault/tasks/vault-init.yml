@@ -31,6 +31,17 @@
       init_iac: "{{ (lookup('file', '~/init-iac.json') | from_json) }}"
     when: status_init_iac.stat.exists
 
+  - name: Vault - check if init-cloud.json exist
+    stat:
+      path: "~/init-cloud.json"
+    register: status_init_cloud
+
+  - set_fact:
+      init_cloud: "{{ (lookup('file', '~/init-cloud.json') | from_json) }}"
+    when: status_init_cloud.stat.exists
+
+
+
 
   - name: Vault - create kv engine with data
     block:
@@ -99,6 +110,16 @@
         headers:
           X-Vault-Token: "{{vault_token.stdout}}"
         body: "{{init_iac}}"
+        body_format: json
+        status_code: 204
+
+    - name: Vault-engine - insert init-cloud config to vault
+      uri:
+        url: "http://127.0.0.1:8200/v1/{{vault_engine_name}}/cloud"
+        method: POST
+        headers:
+          X-Vault-Token: "{{vault_token.stdout}}"
+        body: "{{init_cloud}}"
         body_format: json
         status_code: 204
 

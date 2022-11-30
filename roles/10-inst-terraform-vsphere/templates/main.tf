@@ -7,6 +7,10 @@ data "vault_generic_secret" "config"{
   path = "ansible/config"
 }
 
+data "vault_generic_secret" "cloud"{
+  path = "ansible/cloud"
+}
+
 provider "vsphere" {
   vsphere_server = local.vsphere_server
   user           = local.vsphere_user
