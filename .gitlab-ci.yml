@@ -10,4 +10,8 @@ build-job:
     - iac-runner
   script:
     - echo "Start build job"
-    - ansible-playbook -l local playbooks/play-role.yml -e "ROLE=90-sync-ansible-terraform facts=true"
+    - ansible-playbook -l local playbooks/play-role.yml -e "ROLE=90-sync-ansible-terraform facts=true"                                                                                                            -terraform facts=true"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+      changes:
+        - inventory/*
