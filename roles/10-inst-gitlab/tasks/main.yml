@@ -14,17 +14,22 @@
       src: "docker-compose.yml"
       dest: "{{project_dir}}/gitlab/"
 
-  - name: Gitlab - check deploy
-    stat:
-      path: /home/ansible/gitlab_token
-    register: gitlab_status
+#  - name: Gitlab - check deploy
+#    stat:
+#      path: /home/ansible/gitlab_token
+#    register: gitlab_status
+
+  - set_fact:
+      gitlab_deploy_status: true
+    when: gitlab_token is undefined
+
 
 
 
   - name: Gitlab - deploy if not exist
     block:
 
-    - name: Gitlab deploy - Up project
+    - name: Gitlab deploy - Up project (may take a long time)
       shell: cd {{project_dir}}/gitlab && docker-compose up -d
       register: output
       become: yes
@@ -76,7 +81,7 @@
       shell: |
         sudo docker exec -i gitlab-ce bash -c "gitlab-rails runner \"token = User.find_by_username('{{gitlab_username}}').personal_access_tokens.create(scopes: [:read_user, :api, :read_api, :sudo], name: 'ansible-token'); token.set_token('{{gitlab_token.stdout}}'); token.save! \""
 
-    - name: Gitlab deploy - Get runner token
+    - name: Gitlab deploy - Get runner token (waiting...)
       shell: |
         sudo docker exec -i gitlab-ce bash -c "gitlab-rails runner 'puts Gitlab::CurrentSettings.current_application_settings.runners_registration_token'"
       register: gitlab_runner_token
@@ -116,12 +121,12 @@
 
     - name: Gitlab deploy - switch git repo to local server
       shell: |
-        cd /home/ansible/iac
         git remote rename origin init
         git remote add origin http://ansible-token:{{gitlab_token.stdout}}@{{ansible_default_ipv4.address}}:8000/ansible/iac.git
         git push origin
 
-    when: not gitlab_status.stat.exists
+    #when: not gitlab_status.stat.exists
+    when: gitlab_deploy_status
 
 
 

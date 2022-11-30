@@ -13,21 +13,23 @@
         - unzip
         - gnupg2
       update_cache: yes
+    become: yes
 
   - name: Init - create user ansible
     user:
-      name: ansible
+      name: "{{ansible_user_id}}"
 #      password: "{{ init_ansible_password | password_hash('sha512') }}"
       generate_ssh_key: yes
       ssh_key_bits: 4096
       ssh_key_file: .ssh/id_rsa
       groups:
-       - ansible
+       - "{{ansible_user_id}}"
        - sudo
       state: present
       shell: /bin/bash
       createhome: yes
-      home: /home/ansible
+      home: "/home/{{ansible_user_id}}"
+    become: yes
 
   - name: Init - Disable password for sudoers ansible
     lineinfile:
@@ -36,3 +38,4 @@
       regexp: '^%sudo'
       line: '%sudo ALL=(ALL) NOPASSWD: ALL'
       validate: 'visudo -cf %s'
+    become: yes

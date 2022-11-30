@@ -8,6 +8,7 @@
     file:
       path: "{{project_dir}}/terraform"
       state: directory
+#    become: yes
 
   - name: Terraform - Create plugins dirs structure
     file:
@@ -20,8 +21,8 @@
       src: "{{tf_terraform.arch}}"
       dest: "/usr/bin"
     become: yes
-    become_method: sudo
-    become_user: root
+#    become_method: sudo
+#    become_user: root
 
   - name: Terraform - Extract providers
     unarchive:
@@ -34,10 +35,11 @@
       src: "{{item.srcf}}"
       dest: "{{project_dir}}/terraform/{{item.dstf}}"
     loop:
-      - { srcf: 'main.tf', dstf: 'main.tf' }
+      - { srcf: 'main.tf.j2', dstf: 'main.tf' }
       - { srcf: 'variables.tf', dstf: 'variables.tf' }
       - { srcf: 'versions.tf.j2', dstf: 'versions.tf' }
       - { srcf: 'output.tf', dstf: 'output.tf' }
+#    become: yes
 
 #  - name: Terraform - Change permisions
 #    file:
@@ -50,6 +52,7 @@
   - name: Terraform - Init project
     shell: cd {{project_dir}}/terraform/ && terraform init -no-color
     register: output
+#    become: yes
   - debug: var=output.stdout_lines
 
 

@@ -86,9 +86,11 @@
       become: yes
     when: not check_compose.stat.exists
 
-#  - name: Docker - create project dir
-#    file:
-#      path: "{{ project_dir }}"
-#      state: directory
+  - name: Docker - create project dir
+    file:
+      path: "{{ project_dir }}"
+      state: directory
+      mode: '0777'
+    become: yes
     
 

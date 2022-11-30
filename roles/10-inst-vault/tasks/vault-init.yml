@@ -24,11 +24,11 @@
 
   - name: Vault - check if init-iac.json exist
     stat:
-      path: "/home/ansible/init-iac.json"
+      path: "~/init-iac.json"
     register: status_init_iac
 
   - set_fact:
-      init_iac: "{{ (lookup('file', '/home/ansible/init-iac.json') | from_json) }}"
+      init_iac: "{{ (lookup('file', '~/init-iac.json') | from_json) }}"
     when: status_init_iac.stat.exists
 
 
@@ -49,16 +49,22 @@
         status_code: 200
       register: vault_response
 
-    - debug: var=vault_response['json']['auth']['client_token']
+#    - debug: var=vault_response['json']['auth']['client_token']
 
     - name: Vault - Copy ansible token to file
       copy:
-        dest: "{{git_project_dir}}/../.vault_ansible_token"
+        dest: "{{vault_ansible_token}}"
         content: "{{vault_response['json']['auth']['client_token']}}"
         mode: '600'
-        owner: ansible
+        owner: "{{ansible_user_id}}"
         group: root
       become: yes
+
+    - name: Vault - Add path .vault_ansible_token to all.yml
+      lineinfile:
+        path: "../group_vars/all.yml"
+        line: "vault_ansible_token : \"{{vault_ansible_token}}\""
+        create: yes
 
     - name: Vault-engine - create engine
       uri:
@@ -68,7 +74,7 @@
           X-Vault-Token: "{{vault_token.stdout}}"
         body:
           type: kv
-          description: "Main storage for secrets"
+          description: "Main storage for ansible secrets"
           config:
             force_no_cache: true
           options:
@@ -91,4 +97,4 @@
 
 
 
-  - debug: var=init_iac
+#  - debug: var=init_iac

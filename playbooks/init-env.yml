@@ -4,7 +4,7 @@
    gather_facts: true
    connection: local
    roles:
-     - { role: '0-init-host', become: yes }
+     - '0-init-host'
      - '10-inst-docker'
      - '10-inst-vault'
      - '10-inst-packer-vsphere'

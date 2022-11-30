@@ -13,10 +13,10 @@
     uri:
       url: "http://127.0.0.1:8200/v1/{{vault_engine_name}}/config"
       headers:
-        X-Vault-Token: "{{(lookup('file', '/home/ansible/.vault_ansible_token'))}}"
+        X-Vault-Token: "{{(lookup('file', vault_ansible_token))}}"
     register: outputjson
 
-  - debug: var=outputjson['json']['data']
+###  - debug: var=outputjson['json']['data']
 
   - name: Vault-sync - append key-value to json
     set_fact:
@@ -39,14 +39,14 @@
 
 #  - debug: var=outputjson['json']['data']
 
-  - debug: var=vaultJson
+###  - debug: var=vaultJson
 
   - name: Vault-sync - set json data to vault
     uri:
       url: "http://127.0.0.1:8200/v1/{{vault_engine_name}}/config"
       method: POST
       headers:
-        X-Vault-Token: "{{(lookup('file', '/home/ansible/.vault_ansible_token'))}}"
+        X-Vault-Token: "{{(lookup('file', vault_ansible_token))}}"
 #        Content-Type: "application/merge-patch+json"
       body: "{{vaultJson}}"
       body_format: json

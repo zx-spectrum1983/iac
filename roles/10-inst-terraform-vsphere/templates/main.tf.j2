@@ -1,6 +1,6 @@
 provider "vault" {
   address = "http://127.0.0.1:8200"
-  token = file("/home/ansible/.vault_ansible_token")
+  token = file("{{vault_ansible_token}}")
 }
 
 data "vault_generic_secret" "config"{
@@ -75,7 +75,7 @@ resource "vsphere_virtual_machine" "vm" {
     template_uuid = data.vsphere_virtual_machine.template[each.value.tf_name]["id"]
   }
   provisioner "file" {
-    source = "/home/ansible/.ssh/id_rsa.pub"
+    source = "~/.ssh/id_rsa.pub"
     destination = "/tmp/id_rsa.pub"
   }
   provisioner "remote-exec" {

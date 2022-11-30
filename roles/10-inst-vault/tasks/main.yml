@@ -16,10 +16,11 @@
 #      state: present
 #    become: yes
 
-  - name: Vault - Create compose project dir
+  - name: Vault - Create vault project dir
     file:
       path: "{{project_dir}}/vault"
       state: directory
+#    become: yes
 
   - name: Vault - Copy docker-compose.yml and vault.json to project
     template:
@@ -29,32 +30,33 @@
       - docker-compose.yml
       - config.hcl
       - vault-init.sh
+#    become: yes
 
   - name: Vault - Set execute vault-init.sh
     file:
       dest: "{{project_dir}}/vault/vault-init.sh"
       mode: a+x
-    become: yes
+#    become: yes
 
   - name: Vault - check installation
     stat:
       path: "{{project_dir}}/vault/vault-root-token/.access-token"
     register: vault_status
-    become: yes
+#    become: yes
 
   - name: Vault - read/create root token
     shell: "{% if vault_status.stat.exists %}cat {{project_dir}}/vault/vault-root-token/.access-token{% else %}openssl rand -hex 20{% endif %}"
     register: vault_token
 #    when: vault_status.stat.exists
-    become: yes
+#    become: yes
 
 #  - name: Vault - Generate access token
 #    shell: openssl rand -hex 20
 #    register: vault_token
 #    when: not vault_status.stat.exists
 
-  - debug:
-      var: vault_token.cmd
+#  - debug:
+#      var: vault_token.cmd
 
   - name: Vault - Up project
     shell: cd {{project_dir}}/vault && docker-compose up --build -d
@@ -75,6 +77,9 @@
     copy:
       dest: "{{project_dir}}/vault/vault-root-token/.access-token"
       content: "{{vault_token.stdout}}"
+      owner: "{{ansible_user_id}}"
+      group: root
+      mode: '600'
     when: not vault_status.stat.exists
     become: yes
 

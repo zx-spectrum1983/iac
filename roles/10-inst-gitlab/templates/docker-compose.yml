@@ -20,17 +20,17 @@ services:
     networks:
       - gitlab_net
 
-  gitlab-runner:
-    image: gitlab/gitlab-runner:alpine
-    container_name: gitlab-runner
-    restart: unless-stopped
-    depends_on:
-      - gitlab
-    volumes:
-      - ./etc/gitlab-runner:/etc/gitlab-runner
-      - ./var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - gitlab_net
+#  gitlab-runner:
+#    image: gitlab/gitlab-runner:alpine
+#    container_name: gitlab-runner
+#    restart: unless-stopped
+#    depends_on:
+#      - gitlab
+#    volumes:
+#      - ./etc/gitlab-runner:/etc/gitlab-runner
+#      - ./var/run/docker.sock:/var/run/docker.sock
+#    networks:
+#      - gitlab_net
 
 networks:
   gitlab_net:

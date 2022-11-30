@@ -16,7 +16,7 @@
     register: sync_env_list
 
   - name: Sync - get list of groups in envoriment
-    shell: "cd {{git_project_dir}} && ansible-inventory --list"
+    shell: "ansible-inventory --list"
     register: sync_group_list
 
   - name: Sync - get env list from terraform
