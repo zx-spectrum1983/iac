@@ -12,7 +12,7 @@
 
 
   - name: Sync - get env list from ansible
-    shell: "ls {{inventory_envoriments_dir}}"
+    shell: "ls {{inventory_dir}}/{{inventory_envoriments_dir}}"
     register: sync_env_list
 
   - name: Sync - get list of groups in envoriment
