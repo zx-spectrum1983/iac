@@ -30,6 +30,7 @@
       path: "{{ item.path }}"
       state: absent
     with_items: "{{sync_tf_list.files}}"
+    become: yes
 
   - name: Sync - create env if not exist
     include_tasks: "insert-env.yml"
