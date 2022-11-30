@@ -1,6 +1,5 @@
 ---
 
-
   - name: Sync - Create .pln.tf file
     copy:
       dest: "{{project_dir}}/terraform/{{sync_env_list_item}}.pln.tf"

@@ -25,5 +25,3 @@
     loop: "{{(sync_group_list.stdout | from_json)[sync_group_list_item].hosts}}"
     loop_control:
       loop_var: sync_hosts_list_item
-
-

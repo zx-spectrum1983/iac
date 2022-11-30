@@ -1,22 +1,15 @@
 ---
 
   - name: Sync - check inventory
-    shell: ansible-inventory --list 2>&1 | { grep WARNING || true; }
+    shell: cd {{playbook_dir}}/.. && ansible-inventory --list 2>&1 | { grep WARNING || true; }
     register: inventory_status
 
-#  - fail:
-#      msg: "Inventory has some warnings. Run 'ansible-inventory --list' for details. {{inventory_status.stdout}}"
-#    when: inventory_status.stdout != ""
-  - debug:
-      msg="{{inventory_status.stdout}}"
-
-
   - name: Sync - get env list from ansible
-    shell: "ls {{inventory_dir}}/{{inventory_envoriments_dir}}"
+    shell: "sudo ls {{inventory_dir}}/{{inventory_envoriments_dir}}"
     register: sync_env_list
 
   - name: Sync - get list of groups in envoriment
-    shell: "ansible-inventory --list"
+    shell: cd {{playbook_dir}}/.. && ansible-inventory --list
     register: sync_group_list
 
   - name: Sync - get env list from terraform

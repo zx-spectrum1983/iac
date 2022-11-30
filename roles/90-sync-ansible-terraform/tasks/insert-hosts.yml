@@ -1,6 +1,5 @@
 ---
 
-
   - name: Sync - check existing hosts
     shell: cat {{project_dir}}/terraform/{{sync_env_list_item}}.pln.tf | { grep {{sync_hosts_list_item}} || true; }
     register: existing_host_status
@@ -21,5 +20,3 @@
       regexp: '(.*{{sync_hosts_list_item}}.*)\}$'
       replace: '\1 {{ item.key }}="{{ item.value }}",}'
     loop: "{{query('dict',(sync_group_list.stdout | from_json)._meta.hostvars[sync_hosts_list_item])}}"
-
-
