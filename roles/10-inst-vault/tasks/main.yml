@@ -16,6 +16,13 @@
 #      state: present
 #    become: yes
 
+  - name: Vault - create project dir
+    file:
+      path: "{{ project_dir }}"
+      state: directory
+      mode: '0777'
+    become: yes
+
   - name: Vault - Create vault project dir
     file:
       path: "{{project_dir}}/vault"

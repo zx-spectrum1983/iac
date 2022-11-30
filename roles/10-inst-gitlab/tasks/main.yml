@@ -4,6 +4,13 @@
     debug:
       msg: "########### INSTALL GITLAB AND GITLAB-RUNNER IN DOCKER ###########"
 
+  - name: Gitlab - create project dir
+    file:
+      path: "{{ project_dir }}"
+      state: directory
+      mode: '0777'
+    become: yes
+
   - name: Gitlab - Create gitlab project dir
     file:
       path: "{{project_dir}}/gitlab"

@@ -4,7 +4,14 @@
     debug:
       msg: "########### INSTALL PACKER ###########"
 
-  - name: Packer - Create project dirs
+  - name: Packer - create project dir
+    file:
+      path: "{{ project_dir }}"
+      state: directory
+      mode: '0777'
+    become: yes
+
+  - name: Packer - Create packer project dirs
     file:
       path: "{{item}}"
       state: directory

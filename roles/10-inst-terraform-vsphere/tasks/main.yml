@@ -4,7 +4,14 @@
     debug:
       msg: "########### INSTALL TERRAFORM WITH VSPHERE PROVIDER ###########"
 
-  - name: Terraform - Create project dir
+  - name: Terraform - create project dir
+    file:
+      path: "{{ project_dir }}"
+      state: directory
+      mode: '0777'
+    become: yes
+
+  - name: Terraform - Create terraform project dir
     file:
       path: "{{project_dir}}/terraform"
 #      mode: '775'
