@@ -43,7 +43,7 @@
           X-Vault-Token: "{{vault_token.stdout}}"
         body:
           meta:
-            user: ansible
+            user: "{{ansible_user_id}}"
           renewable: true
         body_format: json
         status_code: 200
@@ -55,9 +55,9 @@
       copy:
         dest: "{{vault_ansible_token}}"
         content: "{{vault_response['json']['auth']['client_token']}}"
-        mode: '600'
+        mode: '640'
         owner: "{{ansible_user_id}}"
-        group: root
+        group: "{{ansible_user_id}}"
       become: yes
 
     - name: Vault - Add path .vault_ansible_token to all.yml

@@ -96,6 +96,10 @@
     - name: Gitlab deploy - create user gitlab-runner
       user:
         name: gitlab-runner
+        groups:
+         - gitlab-runner
+         - "{{ansible_user_id}}"
+         - sudo
         state: present
         shell: /bin/bash
         createhome: yes
@@ -123,6 +127,8 @@
       shell: |
         git remote rename origin init
         git remote add origin http://ansible-token:{{gitlab_token.stdout}}@{{ansible_default_ipv4.address}}:8000/ansible/iac.git
+        git add group_vars/all.yml
+        git commit -m "Ansible: add group_vars/all.yml"
         git push origin
 
     #when: not gitlab_status.stat.exists
