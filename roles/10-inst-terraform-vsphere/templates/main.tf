@@ -1,6 +1,6 @@
 provider "vault" {
   address = "http://127.0.0.1:8200"
-  token = file("{{vault_ansible_token}}")
+  token = file("/etc/vault/.vault_ansible_token")
 }
 
 data "vault_generic_secret" "config"{

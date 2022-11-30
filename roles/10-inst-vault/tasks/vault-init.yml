@@ -51,20 +51,29 @@
 
 #    - debug: var=vault_response['json']['auth']['client_token']
 
+    - name: Vault - Create vault config dir
+      file:
+        path: "/etc/vault"
+        state: directory
+        mode: '750'
+        owner: "{{ansible_user_id}}"
+        group: "{{ansible_user_id}}"
+      become: yes
+
     - name: Vault - Copy ansible token to file
       copy:
-        dest: "{{vault_ansible_token}}"
+        dest: "/etc/vault/.vault_ansible_token"
         content: "{{vault_response['json']['auth']['client_token']}}"
         mode: '640'
         owner: "{{ansible_user_id}}"
         group: "{{ansible_user_id}}"
       become: yes
 
-    - name: Vault - Add path .vault_ansible_token to all.yml
-      lineinfile:
-        path: "../group_vars/all.yml"
-        line: "vault_ansible_token : \"{{vault_ansible_token}}\""
-        create: yes
+#    - name: Vault - Add path .vault_ansible_token to all.yml
+#      lineinfile:
+#        path: "../group_vars/all.yml"
+#        line: "vault_ansible_token : \"{{vault_ansible_token}}\""
+#        create: yes
 
     - name: Vault-engine - create engine
       uri:

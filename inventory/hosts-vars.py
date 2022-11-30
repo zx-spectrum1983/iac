@@ -2,7 +2,6 @@
 
 import os
 import json
-import yaml
 import requests
 import subprocess
 
@@ -51,11 +50,9 @@ def get_config():
       else:
          for key in vaultJson['data']:
             data['local']['vars'][key] = vaultJson['data'][key]
-         #print(json.dumps(data, indent=4))
          get_ip()
          return
    else:
-      #print(json.dumps(data, indent=4))
       get_ip()
    return
 
@@ -63,12 +60,11 @@ def get_config():
 varsJson = '{"local":{"vars":{}}}'
 data = json.loads(varsJson)
 
-tokenfile = os.path.expanduser("~")+"/.vault_ansible_token"
+tokenfile = "/etc/vault/.vault_ansible_token"
 configfile = os.path.expanduser("~")+"/init-iac.json"
-yamlfile = "./group_vars/all.yml"
 
+isExistT = os.path.exists(tokenfile)
 isExistC = os.path.exists(configfile)
-isExistY = os.path.exists(yamlfile)
 
 if isExistC:
    ft = open(configfile)
@@ -76,28 +72,11 @@ if isExistC:
    data['local']['vars'] = configJson
    ft.close()
 
-if isExistY:
-   ft = open(yamlfile)
-   configYaml = yaml.safe_load(ft)
-   ft.close()
-   try:
-      configYaml['vault_ansible_token']
-   except:
-      try:
-         data['local']['vars']['vault_ansible_token']
-      except KeyError:
-         pass
-      else:
-         tokenfile = data['local']['vars']['vault_ansible_token']
-   else:
-      tokenfile = configYaml['vault_ansible_token']
-
 try:
    isOnline = requests.head('http://127.0.0.1:8200/v1/sys/health', verify=False, timeout=1)
 except:
    isOnline = False
    pass
 
-isExistT = os.path.exists(tokenfile)
 get_config()
 

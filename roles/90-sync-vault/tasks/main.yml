@@ -13,7 +13,7 @@
     uri:
       url: "http://127.0.0.1:8200/v1/{{vault_engine_name}}/config"
       headers:
-        X-Vault-Token: "{{(lookup('file', vault_ansible_token))}}"
+        X-Vault-Token: "{{(lookup('file', '/etc/vault/.vault_ansible_token'))}}"
     register: outputjson
 
 ###  - debug: var=outputjson['json']['data']
@@ -46,7 +46,7 @@
       url: "http://127.0.0.1:8200/v1/{{vault_engine_name}}/config"
       method: POST
       headers:
-        X-Vault-Token: "{{(lookup('file', vault_ansible_token))}}"
+        X-Vault-Token: "{{(lookup('file', '/etc/vault/.vault_ansible_token'))}}"
 #        Content-Type: "application/merge-patch+json"
       body: "{{vaultJson}}"
       body_format: json
