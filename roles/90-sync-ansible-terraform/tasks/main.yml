@@ -25,12 +25,14 @@
       patterns: "*.pln.tf"
     register: sync_tf_list
 
+  - name: Sync - Chown terraform files
+    shell: sudo chown -R {{ansible_user_id}}:{{ansible_user_id}} {{project_dir}}/terraform
+
   - name: Sync - Clear previous plan
     file:
       path: "{{ item.path }}"
       state: absent
     with_items: "{{sync_tf_list.files}}"
-    become: yes
 
   - name: Sync - create env if not exist
     include_tasks: "insert-env.yml"

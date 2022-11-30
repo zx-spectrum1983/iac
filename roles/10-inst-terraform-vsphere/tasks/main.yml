@@ -7,7 +7,7 @@
   - name: Terraform - Create project dir
     file:
       path: "{{project_dir}}/terraform"
-      mode: '775'
+#      mode: '775'
       state: directory
 #    become: yes
 
