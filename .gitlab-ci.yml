@@ -10,3 +10,4 @@ build-job:
     - iac-runner
   script:
     - echo "Start build job"
+    - ansible-inventory --list
