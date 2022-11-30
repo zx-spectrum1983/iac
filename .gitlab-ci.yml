@@ -10,4 +10,4 @@ build-job:
     - iac-runner
   script:
     - echo "Start build job"
-    - ansible-inventory --list
+    - ansible-playbook -l local playbooks/play-role.yml -e "ROLE=90-sync-ansible-terraform facts=true"
