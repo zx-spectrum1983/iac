@@ -16,8 +16,6 @@
         X-Vault-Token: "{{(lookup('file', '/etc/vault/.vault_ansible_token'))}}"
     register: outputjson
 
-###  - debug: var=outputjson['json']['data']
-
   - name: Vault-sync - append key-value to json
     set_fact:
       vaultJsonAppend: "{{ outputjson['json']['data'] | combine( { vault_key: vault_value } ) }}"
@@ -53,4 +51,5 @@
       status_code: 204
     when: vault_argument == "append" or vault_argument == "remove"
 
-
+  - debug: var=outputjson['json']['data']
+    when: vault_argument == "list"
