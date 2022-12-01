@@ -2,16 +2,17 @@
 
 # Выполнить любую роль из коллекции
 # ansible-playbook -l <group_from_inventory> playbooks/play-role.yml -e "ROLE=<xx-name-role> facts=false" --check
-# ansible-playbook --connection=local --inventory 127.0.0.1, playbooks/play-role.yml -e "ROLE=xx-name-role facts=false" --check
+
+# Синхронизировать inventory с terraform plan
 # ansible-playbook -l local playbooks/play-role.yml -e "ROLE=90-sync-ansible-terraform facts=true"
+
+# Редактировать конфигурацию в vault
+# vault_argument append/remove
+# vault_key
+# vault_value - if argument append
 # ansible-playbook -l local playbooks/play-role.yml -e "ROLE=90-sync-vault facts=true vault_argument=remove vault_key=gitlab_token"
 
  - hosts: all
-#   remote_user: ansible
-#   become: yes
-#   vars_files:
-#     - "../group_vars/all.yml"
-#     - "../../init-iac.yml"
    gather_facts: "{{facts | default('true')}}"
    roles:
      - '{{ ROLE }}'
