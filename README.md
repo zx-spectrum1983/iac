@@ -9,9 +9,9 @@ A script for automatic installation and configuration of a system that allows yo
 
 ## Test stand:
 
-vSphere 6.7
-External DNS/DHCP server
-Debian 11 virtual machine for system installation (2 cores, 6GB RAM)
+- vSphere 6.7
+- External DNS/DHCP server
+- Debian 11 virtual machine for system installation (2 cores, 6GB RAM)
 
 >Attention!
 >This system does not affect existing hosts on the hypervisor. Modification and deletion is possible only for those hosts that were created through this system. If you try to create a host with an existing name, you will get an error.
