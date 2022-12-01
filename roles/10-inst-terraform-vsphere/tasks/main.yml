@@ -43,7 +43,7 @@
       src: "{{item.srcf}}"
       dest: "{{project_dir}}/terraform/{{item.dstf}}"
     loop:
-      - { srcf: 'main.tf', dstf: 'main.tf' }
+      - { srcf: 'main.tf.j2', dstf: 'main.tf' }
       - { srcf: 'variables.tf', dstf: 'variables.tf' }
       - { srcf: 'versions.tf.j2', dstf: 'versions.tf' }
       - { srcf: 'output.tf', dstf: 'output.tf' }

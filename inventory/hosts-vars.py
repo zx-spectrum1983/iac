@@ -33,10 +33,10 @@ def get_ip():
 def get_config():
    global isExistT
    global data
-   if isExistT and isOnline:
+   if isExistT and isExistE and isOnline:
       ft = open(tokenfile)
       token = ft.read()
-      url = 'http://127.0.0.1:8200/v1/ansible/config'
+      url = 'http://127.0.0.1:8200/v1/'+enginename+'/config'
       headers = {'X-Vault-Token': token}
       response = requests.get(url, headers=headers)
       vaultJson = json.loads(response.text)
@@ -61,10 +61,12 @@ varsJson = '{"local":{"vars":{}}}'
 data = json.loads(varsJson)
 
 tokenfile = "/etc/vault/.vault_ansible_token"
+enginefile = "/etc/vault/.vault_engine"
 configfile = os.path.expanduser("~")+"/init-iac.json"
 icloudfile = os.path.expanduser("~")+"/init-cloud.json"
 
 isExistT = os.path.exists(tokenfile)
+isExistE = os.path.exists(enginefile)
 isExistC = os.path.exists(configfile)
 isExistI = os.path.exists(icloudfile)
 
@@ -79,6 +81,11 @@ if isExistI:
    cloudJson = json.load(ft)
    for key in cloudJson:
       data['local']['vars'][key] = cloudJson[key]
+   ft.close()
+
+if isExistE:
+   ft = open(enginefile)
+   enginename = ft.read()
    ft.close()
 
 try:

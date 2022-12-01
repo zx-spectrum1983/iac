@@ -80,6 +80,15 @@
         group: "{{ansible_user_id}}"
       become: yes
 
+    - name: Vault - Copy ansible engine name to file
+      copy:
+        dest: "/etc/vault/.vault_engine"
+        content: "{{vault_engine_name}}"
+        mode: '640'
+        owner: "{{ansible_user_id}}"
+        group: "{{ansible_user_id}}"
+      become: yes
+
 #    - name: Vault - Add path .vault_ansible_token to all.yml
 #      lineinfile:
 #        path: "../group_vars/all.yml"

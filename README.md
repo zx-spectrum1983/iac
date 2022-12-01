@@ -37,7 +37,7 @@ Create a virtual machine with Debian 11 settings, 2 cores, 6GB RAM to install th
 The script is supposed to be run as the ansible user, to do this, add it to the sudo group and disable the password for privilege escalation:
 
 ```
-# usermod -aG sudo
+# usermod -aG sudo your_user
 # visudo
 Append at the end of the file:
 %sudo ALL=(ALL) NOPASSWD: ALL

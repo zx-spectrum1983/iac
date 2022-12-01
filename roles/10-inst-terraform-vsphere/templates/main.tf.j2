@@ -4,11 +4,11 @@ provider "vault" {
 }
 
 data "vault_generic_secret" "config"{
-  path = "ansible/config"
+  path = "{{vault_engine_name}}/config"
 }
 
 data "vault_generic_secret" "cloud"{
-  path = "ansible/cloud"
+  path = "{{vault_engine_name}}/cloud"
 }
 
 provider "vsphere" {
