@@ -107,3 +107,6 @@ Run the following commands to start the installation:
 
 If something went wrong during the installation process, find out what is missing and run the script again. Once installed, delete the init-cloud.json and init-iac.json files.
 
+## Contact:
+
+Николай Дусенко [Nickolay Dusenko](https://t.me/zx_spe)
