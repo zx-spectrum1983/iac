@@ -36,11 +36,11 @@
     loop:
       - { srcf: 'tf-templ-ubuntu14/preseed.cfg.j2', dstf: 'tf-templ-ubuntu14/preseed.cfg' }
       - { srcf: 'tf-templ-ubuntu14/variables.pkr.hcl.j2', dstf: 'tf-templ-ubuntu14/variables.pkr.hcl' }
-#      - { srcf: 'tf-templ-ubuntu14/vars.auto.pkrvars.hcl.j2', dstf: 'tf-templ-ubuntu14/vars.auto.pkrvars.hcl' }
+      - { srcf: 'tf-templ-ubuntu14/build.sh', dstf: 'tf-templ-ubuntu14/build.sh' }
       - { srcf: 'tf-templ-ubuntu14/vsphere-iso_basic_ubuntu.pkr.hcl.j2', dstf: 'tf-templ-ubuntu14/vsphere-iso_basic_ubuntu.pkr.hcl' }
       - { srcf: 'tf-templ-debian11/preseed.cfg.j2', dstf: 'tf-templ-debian11/preseed.cfg' }
       - { srcf: 'tf-templ-debian11/variables.pkr.hcl.j2', dstf: 'tf-templ-debian11/variables.pkr.hcl' }
-#      - { srcf: 'tf-templ-debian11/vars.auto.pkrvars.hcl.j2', dstf: 'tf-templ-debian11/vars.auto.pkrvars.hcl' }
+      - { srcf: 'tf-templ-debian11/build.sh', dstf: 'tf-templ-debian11/build.sh' }
       - { srcf: 'tf-templ-debian11/vsphere-iso_basic_debian.pkr.hcl.j2', dstf: 'tf-templ-debian11/vsphere-iso_basic_debian.pkr.hcl' }
 #    become: yes
 
@@ -58,7 +58,7 @@
   - name: Packer - Create vm template debian
     block:
       - name: Packer - create template {{tf_packer_debian11_name}}, may take long time
-        shell: cd {{project_dir}}/packer/tf-templ-debian11/ && packer build .
+        shell: cd {{project_dir}}/packer/tf-templ-debian11/ && packer build -force .
         register: output
         environment:
           VAULT_ADDR: "http://127.0.0.1:8200"
@@ -69,7 +69,7 @@
   - name: Packer - Create vm template ubuntu
     block:
       - name: Packer - create template {{tf_packer_ubuntu14_name}}, may take long time
-        shell: cd {{project_dir}}/packer/tf-templ-ubuntu14/ && packer build .
+        shell: cd {{project_dir}}/packer/tf-templ-ubuntu14/ && packer build -force .
         register: output
         environment:
           VAULT_ADDR: "http://127.0.0.1:8200"
