@@ -47,6 +47,7 @@
       - { srcf: 'variables.tf', dstf: 'variables.tf' }
       - { srcf: 'versions.tf.j2', dstf: 'versions.tf' }
       - { srcf: 'output.tf', dstf: 'output.tf' }
+      - { srcf: 'provisioner.sh', dstf: 'provisioner.sh' }
 #    become: yes
 
 #  - name: Terraform - Change permisions

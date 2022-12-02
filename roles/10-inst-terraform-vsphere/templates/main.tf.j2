@@ -82,14 +82,14 @@ resource "vsphere_virtual_machine" "vm" {
     source = "~/.ssh/id_rsa.pub"
     destination = "/tmp/id_rsa.pub"
   }
+  provisioner "file" {
+    source = "provisioner.sh"
+    destination = "/tmp/provisioner.sh"
+  }
   provisioner "remote-exec" {
     inline = [
-      "sudo hostnamectl set-hostname ${each.value.tf_name}",
-      "sudo sed -i 's/${each.value.tf_template}/${each.value.tf_name}/g' /etc/hosts",
-      "sudo pkill dhclient && sudo /sbin/dhclient -4",
-      "mkdir /home/${data.vault_generic_secret.config.data["tf_packer_init_ssh_username"]}/.ssh && touch /home/${data.vault_generic_secret.config.data["tf_packer_init_ssh_username"]}/.ssh/authorized_keys",
-      "chmod 700 /home/${data.vault_generic_secret.config.data["tf_packer_init_ssh_username"]}/.ssh && chmod 600 /home/${data.vault_generic_secret.config.data["tf_packer_init_ssh_username"]}/.ssh/authorized_keys",
-      "cat /tmp/id_rsa.pub >> /home/${data.vault_generic_secret.config.data["tf_packer_init_ssh_username"]}/.ssh/authorized_keys",
+      "chmod +x /tmp/provisioner.sh",
+      "sudo /tmp/provisioner.sh ${each.value.tf_name} ${each.value.tf_template} ${try(each.value.tf_user, data.vault_generic_secret.config.data["tf_packer_init_ssh_username"])} ${try(each.value.tf_password, data.vault_generic_secret.config.data["tf_packer_init_ssh_password"])}",
     ]
   }
   connection {
