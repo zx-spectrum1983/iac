@@ -79,7 +79,7 @@ resource "vsphere_virtual_machine" "vm" {
     template_uuid = data.vsphere_virtual_machine.template[each.value.tf_name]["id"]
   }
   provisioner "file" {
-    source = "~/.ssh/id_rsa.pub"
+    source = try(each.value.tf_sshkey, "~/.ssh/id_rsa.pub")
     destination = "/tmp/id_rsa.pub"
   }
   provisioner "file" {
