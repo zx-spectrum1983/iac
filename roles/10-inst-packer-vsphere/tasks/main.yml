@@ -11,71 +11,73 @@
       mode: '0777'
     become: yes
 
-  - name: Packer - Create packer project dirs
+  - name: Packer - create packer project dir
     file:
-      path: "{{item}}"
+      path: "{{ project_dir }}/packer"
       state: directory
-    loop:
-      - "{{project_dir}}/packer"
-      - "{{project_dir}}/packer/tf-templ-debian11"
-      - "{{project_dir}}/packer/tf-templ-ubuntu14"
-#    become: yes
 
   - name: Packer - Extract packer binary file
     unarchive:
       src: "{{tf_packer_archive}}"
       dest: "/usr/bin"
     become: yes
-#    become_method: sudo
-#    become_user: root
 
-  - name: Packer - copy all projects files
+  - name: Packer - copy base projects files
     template:
       src: "{{item.srcf}}"
       dest: "{{project_dir}}/packer/{{item.dstf}}"
     loop:
-      - { srcf: 'tf-templ-ubuntu14/preseed.cfg.j2', dstf: 'tf-templ-ubuntu14/preseed.cfg' }
-      - { srcf: 'tf-templ-ubuntu14/variables.pkr.hcl.j2', dstf: 'tf-templ-ubuntu14/variables.pkr.hcl' }
-      - { srcf: 'tf-templ-ubuntu14/build.sh', dstf: 'tf-templ-ubuntu14/build.sh' }
-      - { srcf: 'tf-templ-ubuntu14/vsphere-iso_basic_ubuntu.pkr.hcl.j2', dstf: 'tf-templ-ubuntu14/vsphere-iso_basic_ubuntu.pkr.hcl' }
-      - { srcf: 'tf-templ-debian11/preseed.cfg.j2', dstf: 'tf-templ-debian11/preseed.cfg' }
-      - { srcf: 'tf-templ-debian11/variables.pkr.hcl.j2', dstf: 'tf-templ-debian11/variables.pkr.hcl' }
-      - { srcf: 'tf-templ-debian11/build.sh', dstf: 'tf-templ-debian11/build.sh' }
-      - { srcf: 'tf-templ-debian11/vsphere-iso_basic_debian.pkr.hcl.j2', dstf: 'tf-templ-debian11/vsphere-iso_basic_debian.pkr.hcl' }
-#    become: yes
-
-#  - name: Packer - Change permisions
-#    file:
-#      path: "{{item}}"
-#      owner: ansible
-#      group: root
-#      mode: '600'
-#    loop:
-#      - "{{project_dir}}/packer/tf-templ-ubuntu14/vars.auto.pkrvars.hcl"
-#      - "{{project_dir}}/packer/tf-templ-debian11/vars.auto.pkrvars.hcl"
-#    become: yes
+      - { srcf: 'variables.pkr.hcl.j2', dstf: 'variables.pkr.hcl' }
+      - { srcf: 'build.sh', dstf: 'build.sh' }
 
   - name: Packer - Create vm template debian
-    block:
-      - name: Packer - create template {{tf_packer_debian11_name}}, may take long time
-        shell: cd {{project_dir}}/packer/tf-templ-debian11/ && packer build -force .
-        register: output
-        environment:
-          VAULT_ADDR: "http://127.0.0.1:8200"
-          VAULT_TOKEN: "{{ lookup('file', '/etc/vault/.vault_ansible_token') }}"
-      - debug: var=output.stdout_lines
+    include_role:
+      name: 20-crte-packer-template
+    vars:
+      tf_packer_image: "tf-templ-debian11"
+      tf_packer_image_name: "{{tf_packer_debian11_name}}"
+      tf_packer_image_addition_pkgs: "{{tf_packer_debian11_addition_pkgs}}"
+      tf_packer_image_CPUs: "{{tf_packer_debian11_CPUs}}"
+      tf_packer_image_RAM: "{{tf_packer_debian11_RAM}}"
+      tf_packer_image_size: "{{tf_packer_debian11_size}}"
+      tf_packer_image_iso_path: "{{tf_packer_debian11_iso_path}}"
     when: tf_packer_debian11 == true
 
   - name: Packer - Create vm template ubuntu
-    block:
-      - name: Packer - create template {{tf_packer_ubuntu14_name}}, may take long time
-        shell: cd {{project_dir}}/packer/tf-templ-ubuntu14/ && packer build -force .
-        register: output
-        environment:
-          VAULT_ADDR: "http://127.0.0.1:8200"
-          VAULT_TOKEN: "{{ lookup('file', '/etc/vault/.vault_ansible_token') }}"
-      - debug: var=output.stdout_lines
+    include_role:
+      name: 20-crte-packer-template
+    vars:
+      tf_packer_image: "tf-templ-ubuntu14"
+      tf_packer_image_name: "{{tf_packer_ubuntu14_name}}"
+      tf_packer_image_addition_pkgs: "{{tf_packer_ubuntu14_addition_pkgs}}"
+      tf_packer_image_CPUs: "{{tf_packer_ubuntu14_CPUs}}"
+      tf_packer_image_RAM: "{{tf_packer_ubuntu14_RAM}}"
+      tf_packer_image_size: "{{tf_packer_ubuntu14_size}}"
+      tf_packer_image_iso_path: "{{tf_packer_ubuntu14_iso_path}}"
     when: tf_packer_ubuntu14 == true
+
+
+#  - name: Packer - Create vm template debian
+#    block:
+#      - name: Packer - create template {{tf_packer_debian11_name}}, may take long time
+#        shell: cd {{project_dir}}/packer/tf-templ-debian11/ && packer build -force .
+#        register: output
+#        environment:
+#          VAULT_ADDR: "http://127.0.0.1:8200"
+#          VAULT_TOKEN: "{{ lookup('file', '/etc/vault/.vault_ansible_token') }}"
+#      - debug: var=output.stdout_lines
+#    when: tf_packer_debian11 == true
+
+#  - name: Packer - Create vm template ubuntu
+#    block:
+#      - name: Packer - create template {{tf_packer_ubuntu14_name}}, may take long time
+#        shell: cd {{project_dir}}/packer/tf-templ-ubuntu14/ && packer build -force .
+#        register: output
+#        environment:
+#          VAULT_ADDR: "http://127.0.0.1:8200"
+#          VAULT_TOKEN: "{{ lookup('file', '/etc/vault/.vault_ansible_token') }}"
+#      - debug: var=output.stdout_lines
+#    when: tf_packer_ubuntu14 == true
 
 
 

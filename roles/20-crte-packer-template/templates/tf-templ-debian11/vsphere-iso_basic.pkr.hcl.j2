@@ -6,31 +6,31 @@ source "vsphere-iso" "this" {
   cluster           = local.cluster
   insecure_connection  = true
 
-  vm_name = "{{tf_packer_debian11_name}}"
+  vm_name = "{{tf_packer_image_name}}"
   guest_os_type = "debian10_64Guest"
 
   ssh_username = "{{tf_packer_init_ssh_username}}"
   ssh_password = "{{tf_packer_init_ssh_password}}"
 
-  CPUs =             {{tf_packer_debian11_CPUs}}
-  RAM =              {{tf_packer_debian11_RAM}}
+  CPUs =             {{tf_packer_image_CPUs | default('1', true) }}
+  RAM =              {{tf_packer_image_RAM | default('1024', true)}}
   RAM_reserve_all = true
 
   disk_controller_type =  ["pvscsi"]
   datastore = local.datastore
   storage {
-    disk_size =        {{tf_packer_debian11_size}}
+    disk_size =        {{tf_packer_image_size | default('32768', true)}}
     disk_thin_provisioned = true
   }
 
-  iso_paths = ["{{tf_packer_debian11_iso_path}}"]
+  iso_paths = ["{{tf_packer_image_iso_path}}"]
 
   network_adapters {
     network =  local.network_name
     network_card = "vmxnet3"
   }
 
-  http_directory = "{{project_dir}}/packer/tf-templ-debian11"
+  http_directory = "{{project_dir}}/packer"
 
   boot_command = [
     "<esc><wait>",
@@ -43,7 +43,7 @@ source "vsphere-iso" "this" {
     "locale=en_US.UTF-8 <wait>",
     "kbd-chooser/method=us <wait>",
     "keyboard-configuration/xkb-keymap=us <wait>",
-    "netcfg/get_hostname={{tf_packer_debian11_name}} <wait>",
+    "netcfg/get_hostname={{tf_packer_image_name}} <wait>",
     "netcfg/get_domain=vsphere.local <wait>",
     "fb=false <wait>",
     "debconf/frontend=noninteractive <wait>",

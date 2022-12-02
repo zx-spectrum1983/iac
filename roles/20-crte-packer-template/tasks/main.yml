@@ -1,0 +1,35 @@
+---
+
+# tf_packer_image: - dir with configs
+#   - tf-templ-ubuntu14
+#   - tf-templ-debian11
+# tf_packer_image_name
+# tf_packer_image_iso_path
+# [tf_packer_image_addition_pkgs]
+# [tf_packer_image_CPUs]
+# [tf_packer_image_RAM]
+# [tf_packer_image_size]
+
+
+
+  - name: Start role
+    debug:
+      msg: "########### CREATE TEMPLATE {{tf_packer_image}} WITH PACKER ###########"
+
+  - name: Packer-create - copy template config files
+    template:
+      src: "{{item.srcf}}"
+      dest: "{{project_dir}}/packer/{{item.dstf}}"
+    loop:
+      - { srcf: "{{tf_packer_image}}/preseed.cfg.j2", dstf: "preseed.cfg" }
+      - { srcf: "{{tf_packer_image}}/vsphere-iso_basic.pkr.hcl.j2", dstf: "vsphere-iso_basic.pkr.hcl" }
+
+
+  - name: Packer - create template, may take long time
+    shell: cd {{project_dir}}/packer/ && packer build -force .
+    register: output
+    environment:
+      VAULT_ADDR: "http://127.0.0.1:8200"
+      VAULT_TOKEN: "{{ lookup('file', '/etc/vault/.vault_ansible_token') }}"
+  - debug: var=output.stdout_lines
+

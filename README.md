@@ -75,14 +75,27 @@ In the ansible user's home directory, create two installation configuration file
 
   "Comment": "Packer template settings",
 
-  "tf_packer_debian11": true,
-  "tf_packer_ubuntu14": true,
+  "tf_packer_debian11": false,
+  "tf_packer_debian11_iso_path": "[datastore3] iso/debian-11.5.0-amd64-netinst.iso",
+  "tf_packer_debian11_name": "tf-templ-debian11",
+  "tf_packer_debian11_CPUs": "1",
+  "tf_packer_debian11_RAM": "1024",
+  "tf_packer_debian11_size": "32768",
+  "tf_packer_debian11_addition_pkgs" : "git ansible mc",
+
+
+  "tf_packer_ubuntu14": false,
+  "tf_packer_ubuntu14_iso_path": "[datastore3] iso/ubuntu-14.04.1-server-amd64.iso",
+  "tf_packer_ubuntu14_name": "tf-templ-ubuntu14",
+  "tf_packer_ubuntu14_CPUs": "1",
+  "tf_packer_ubuntu14_RAM": "1024",
+  "tf_packer_ubuntu14_size": "16384",
+  "tf_packer_ubuntu14_addition_pkgs": "git ansible mc",
+
   "tf_packer_init_ssh_username": "ansible",
-  "tf_packer_init_ssh_password": "ansible_",
-  "tf_packer_dst_datastore": "datastore1",
+  "tf_packer_init_ssh_password": "ansible",
+  "tf_packer_dst_datastore": "datastore3",
   "tf_packer_dst_network": "VM Network",
-  "tf_packer_ubuntu14_iso_path": "[datastore2] iso/ubuntu-14.04.1-server-amd64.iso",
-  "tf_packer_debian11_iso_path": "[datastore2] iso/debian-11.5.0-amd64-netinst.iso",
 
   "Comment": "Gitlab settings",
 

@@ -12,6 +12,10 @@
 # vault_value - if argument append
 # ansible-playbook -l local playbooks/play-role.yml -e "ROLE=90-sync-vault facts=true vault_argument=remove vault_key=gitlab_token"
 
+# Сгенерировать новый шаблон
+# tf_packer_image: tf-templ-debian11/tf-templ-ubuntu14
+# ansible-playbook -l local playbooks/play-role.yml -e "ROLE=20-crte-packer-template tf_packer_image=tf-templ-debian11 tf_packer_image_name=templ-deb-ansible tf_packer_image_iso_path='[datastore3] iso/debian-11.5.0-amd64-netinst.iso'"
+
  - hosts: all
    gather_facts: "{{facts | default('true')}}"
    roles:
