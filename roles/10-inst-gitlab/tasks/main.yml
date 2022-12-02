@@ -11,6 +11,9 @@
       mode: '0777'
     become: yes
 
+  - name: Gitlab - Clear previous installation
+    include_tasks: "remove-gitlab.yml"
+
   - name: Gitlab - Create gitlab project dir
     file:
       path: "{{project_dir}}/gitlab"
@@ -27,8 +30,15 @@
 #    register: gitlab_status
 
   - set_fact:
-      gitlab_deploy_status: true
+      gitlab_token: ""
     when: gitlab_token is undefined
+
+  - set_fact:
+      gitlab_deploy_status: false
+
+  - set_fact:
+      gitlab_deploy_status: true
+    when: gitlab_token == ""
 
 
 
@@ -37,7 +47,7 @@
     block:
 
     - name: Gitlab deploy - Up project (may take a long time)
-      shell: cd {{project_dir}}/gitlab && docker-compose up -d
+      shell: "cd {{project_dir}}/gitlab && docker-compose up -d"
       register: output
       become: yes
 
@@ -152,16 +162,17 @@
 
     - name: Gitlab deploy - switch git repo to local server
       shell: |
-        git remote rename origin init
-        git remote add origin http://ansible-token:{{gitlab_token.stdout}}@{{ansible_default_ipv4.address}}:8000/ansible/iac.git
+        cd ..
+        [ `git remote | grep init` ] && git remote remove origin || git remote rename origin init
+        git remote add origin http://ansible-token:{{gitlab_token.stdout}}@{{ansible_default_ipv4.address}}:8000/{{gitlab_username}}/iac.git
         git push origin
 
-    #when: not gitlab_status.stat.exists
+#    when: not gitlab_status.stat.exists
     when: gitlab_deploy_status
 
 
-
-
+#        git remote rename origin init &> /dev/null ; [ $? -eq 3 ] && git remote remove origin
+#        git remote rename origin init &> /dev/null || git remote remove origin
 
 
 

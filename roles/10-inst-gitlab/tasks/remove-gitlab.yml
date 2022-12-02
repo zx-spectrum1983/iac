@@ -1,0 +1,44 @@
+---
+
+  - name: Gitlab-remove - stop docker-compose project
+    shell: "[ -d \"{{project_dir}}/gitlab\" ] && (cd {{project_dir}}/gitlab && docker-compose down)"
+    become: yes
+
+  - name: Gitlab-remove - stop runner
+    shell: "command -v gitlab-runner &> /dev/null && gitlab-runner stop"
+    become: yes
+
+  - name: Gitlab-remove - delete project dir
+    file:
+      path: "{{project_dir}}/gitlab"
+      state: absent
+    become: yes
+
+  - name: Gitlab-remove - delete runner config
+    file:
+      path: "/etc/gitlab-runner"
+      state: absent
+    become: yes
+
+  - name: Gitlab-remove - delete runner service
+    file:
+      path: "/etc/systemd/system/gitlab-runner.service"
+      state: absent
+    become: yes
+
+  - name: Gitlab-remove - delete root password from vault
+    include_role:
+      name: 90-sync-vault
+    vars:
+      vault_argument: "remove"
+      vault_key: "gitlab_root_password"
+
+  - name: Gitlab-remove - delete token from vault
+    include_role:
+      name: 90-sync-vault
+    vars:
+      vault_argument: "remove"
+      vault_key: "gitlab_token"
+
+  - set_fact:
+      gitlab_token: ""
