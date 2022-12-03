@@ -12,6 +12,7 @@
 
   - name: Vault-remove - Delete volume in docker
     shell: docker volume rm vault_vault-data
+    when: vault_project_dir.stat.exists
     become: yes
 
   - name: Vault-remove - Delete vault project dir
