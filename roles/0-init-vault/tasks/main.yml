@@ -1,6 +1,15 @@
 ---
 
-  - name: Vault - Wait for building project (take few minutes...)
+  - name: Start role
+    debug:
+      msg: "########### INIT VAULT ###########"
+
+  - name: Vault-init - read root token
+    shell: "cat {{project_dir}}/vault/vault-root-token/.access-token"
+    register: vault_token
+    become: yes
+
+  - name: Vault-init - Wait for building project (take few minutes...)
     uri:
       url: "http://127.0.0.1:8200/v1/sys/health"
       method: GET
@@ -10,7 +19,7 @@
     retries: 60
     delay: 10
 
-  - name: Vault - Check if engine exists
+  - name: Vault-init - Check if engine exists
     uri:
       url: http://127.0.0.1:8200/v1/sys/mounts
       headers:
@@ -22,7 +31,7 @@
 
   - debug: var=outputjson['json']['{{vault_engine_name}}/']
 
-  - name: Vault - check if init-iac.json exist
+  - name: Vault-init - check if init-iac.json exist
     stat:
       path: "~/init-iac.json"
     register: status_init_iac
@@ -31,7 +40,7 @@
       init_iac: "{{ (lookup('file', '~/init-iac.json') | from_json) }}"
     when: status_init_iac.stat.exists
 
-  - name: Vault - check if init-cloud.json exist
+  - name: Vault-init - check if init-cloud.json exist
     stat:
       path: "~/init-cloud.json"
     register: status_init_cloud
@@ -43,7 +52,7 @@
 
 
 
-  - name: Vault - create kv engine with data
+  - name: Vault-init - create kv engine with data
     block:
 
     - name: Vault-engine - create ansible token
@@ -62,7 +71,7 @@
 
 #    - debug: var=vault_response['json']['auth']['client_token']
 
-    - name: Vault - Create vault config dir
+    - name: Vault-engine - Create vault config dir
       file:
         path: "/etc/vault"
         state: directory
@@ -71,7 +80,7 @@
         group: "{{ansible_user_id}}"
       become: yes
 
-    - name: Vault - Copy ansible token to file
+    - name: Vault-engine - Copy ansible token to file
       copy:
         dest: "/etc/vault/.vault_ansible_token"
         content: "{{vault_response['json']['auth']['client_token']}}"
@@ -80,7 +89,7 @@
         group: "{{ansible_user_id}}"
       become: yes
 
-    - name: Vault - Copy ansible engine name to file
+    - name: Vault-engine - Copy ansible engine name to file
       copy:
         dest: "/etc/vault/.vault_engine"
         content: "{{vault_engine_name}}"
