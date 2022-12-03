@@ -4,9 +4,31 @@
    gather_facts: true
    connection: local
    roles:
-     - '0-init-host'
-     - '10-inst-docker'
-     - '10-inst-vault'
-     - '10-inst-packer-vsphere'
-     - '10-inst-terraform-vsphere'
-     - '10-inst-gitlab'
+     - role: '0-init-host'
+     - role: '10-inst-docker'
+     - role: '10-inst-vault'
+     - role: '0-init-vault'
+       when: vault_engine_init
+     - role: '10-inst-packer-vsphere'
+     - role: '20-crte-packer-template'
+       vars:
+         tf_packer_image: "tf-templ-debian11"
+         tf_packer_image_name: "{{tf_packer_debian11_name}}"
+         tf_packer_image_addition_pkgs: "{{tf_packer_debian11_addition_pkgs}}"
+         tf_packer_image_CPUs: "{{tf_packer_debian11_CPUs}}"
+         tf_packer_image_RAM: "{{tf_packer_debian11_RAM}}"
+         tf_packer_image_size: "{{tf_packer_debian11_size}}"
+         tf_packer_image_iso_path: "{{tf_packer_debian11_iso_path}}"
+       when: tf_packer_debian11
+     - role: '20-crte-packer-template'
+       vars:
+         tf_packer_image: "tf-templ-ubuntu14"
+         tf_packer_image_name: "{{tf_packer_ubuntu14_name}}"
+         tf_packer_image_addition_pkgs: "{{tf_packer_ubuntu14_addition_pkgs}}"
+         tf_packer_image_CPUs: "{{tf_packer_ubuntu14_CPUs}}"
+         tf_packer_image_RAM: "{{tf_packer_ubuntu14_RAM}}"
+         tf_packer_image_size: "{{tf_packer_ubuntu14_size}}"
+         tf_packer_image_iso_path: "{{tf_packer_ubuntu14_iso_path}}"
+       when: tf_packer_ubuntu14
+     - role: '10-inst-terraform-vsphere'
+     - role: '10-inst-gitlab'
