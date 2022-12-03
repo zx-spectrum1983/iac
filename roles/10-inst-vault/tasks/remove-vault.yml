@@ -1,0 +1,27 @@
+---
+
+  - name: Vault-remove - check project dir
+    stat:
+      path: "{{project_dir}}/vault"
+    register: vault_project_dir
+
+  - name: Vault-remove - Down project
+    shell: cd {{project_dir}}/vault && docker-compose down
+    when: vault_project_dir.stat.exists
+    become: yes
+
+  - name: Vault-remove - Delete volume in docker
+    shell: docker volume rm vault_vault-data
+    become: yes
+
+  - name: Vault-remove - Delete vault project dir
+    file:
+      path: "{{project_dir}}/vault"
+      state: absent
+    become: yes
+
+  - name: Vault-remove - delete token
+    file:
+      path: "/etc/vault"
+      state: absent
+    become: yes

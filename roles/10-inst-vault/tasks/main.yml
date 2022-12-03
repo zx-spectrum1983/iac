@@ -23,6 +23,9 @@
       mode: '0777'
     become: yes
 
+  - name: Vault - Clear previous installation
+    include_tasks: "remove-vault.yml"
+
   - name: Vault - Create vault project dir
     file:
       path: "{{project_dir}}/vault"
