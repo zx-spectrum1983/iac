@@ -1,0 +1,15 @@
+[Unit]
+Description=Unseal vault
+Requires=docker.service
+After=docker.service
+BindsTo=docker.service
+ReloadPropagatedFrom=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/docker start vault-init
+ExecReload=/usr/bin/docker start vault-init
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

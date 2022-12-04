@@ -15,6 +15,12 @@
     when: vault_project_dir.stat.exists
     become: yes
 
+  - name: Vault-remove - Delete systemd unit
+    file:
+      path: /etc/systemd/system/vault-init.service
+      state: absent
+    become: yes
+
   - name: Vault-remove - Delete vault project dir
     file:
       path: "{{project_dir}}/vault"

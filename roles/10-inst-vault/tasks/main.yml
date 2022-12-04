@@ -93,6 +93,18 @@
     when: not vault_status.stat.exists
     become: yes
 
+  - name: Vault - Install systemd unit for unseal
+    template:
+      src: vault-init.service
+      dest: /etc/systemd/system/vault-init.service
+    become: yes
+
+  - name: Vault - Enable vault-init.service
+    service:
+      name: vault-init
+      enabled: yes
+    become: yes
+
 #  - name: Vault - init new engine with secrets
 #    include_role:
 #      name: 0-init-vault
