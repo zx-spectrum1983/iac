@@ -47,12 +47,23 @@
     block:
 
     - name: Gitlab deploy - Up project (may take a long time)
+      async: 1800
+      poll: 0
       shell: "cd {{project_dir}}/gitlab && docker-compose up -d"
-      register: output
+      register: gitlab_async_result
       become: yes
 
-    - debug:
-        var: output.stderr_lines
+    - name: Gitlab deploy - Wait for gitlab deploy complete
+      async_status:
+        jid: "{{ gitlab_async_result.ansible_job_id }}"
+      register: gitlab_job_result
+      until: gitlab_job_result.finished
+      retries: 120
+      delay: 15
+      become: yes
+
+#    - debug:
+#        var: output.stderr_lines
 
     - name: Gitlab deploy - Wait for building project (take few minutes...)
       uri:
