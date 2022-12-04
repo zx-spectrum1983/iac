@@ -1,12 +1,24 @@
 ---
 
+  - name: Gitlab-remove check project dir
+    stat:
+      path: "{{project_dir}}/gitlab"
+    register: gitlab_status
+
   - name: Gitlab-remove - stop docker-compose project
     shell: "[ -d \"{{project_dir}}/gitlab\" ] && (cd {{project_dir}}/gitlab && docker-compose down)"
     become: yes
+    when: gitlab_status.stat.exists
+
+  - name: Gitlab-remove check runner exists
+    stat:
+      path: "/usr/local/bin/gitlab-runner"
+    register: gitlab_runner_status
 
   - name: Gitlab-remove - stop runner
     shell: "command -v gitlab-runner &> /dev/null && gitlab-runner stop"
     become: yes
+    when: gitlab_runner_status.stat.exists
 
   - name: Gitlab-remove - delete project dir
     file:
