@@ -8,9 +8,9 @@ stage
 prod
 
 [stage_env:vars]
-tf_cpu_count=1
-tf_memory=1024
-tf_datastore="datastore3"
+tf_cpu_count=2
+tf_memory=2048
+tf_datastore="datastore2"
 tf_disk_size=32
 tf_network="VM Network"
 tf_template="tf-templ-debian11"

@@ -25,11 +25,24 @@
       - { srcf: "{{tf_packer_image}}/vsphere-iso_basic.pkr.hcl.j2", dstf: "vsphere-iso_basic.pkr.hcl" }
 
 
+  - name: Packer - create template async mode
+    async: 1800
+    poll: 0
+    shell: cd {{project_dir}}/packer/ && packer build -force .
+    environment:
+      VAULT_ADDR: "http://127.0.0.1:8200"
+      VAULT_TOKEN: "{{ lookup('file', '/etc/vault/.vault_ansible_token') }}"
+    register: async_result
+    when: tf_packer_async | default(false)
+
   - name: Packer - create template, may take long time
     shell: cd {{project_dir}}/packer/ && packer build -force .
     register: output
     environment:
       VAULT_ADDR: "http://127.0.0.1:8200"
       VAULT_TOKEN: "{{ lookup('file', '/etc/vault/.vault_ansible_token') }}"
+    when: not tf_packer_async | default(false)
+
   - debug: var=output.stdout_lines
+    when: not tf_packer_async | default(false)
 

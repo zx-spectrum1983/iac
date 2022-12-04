@@ -12,6 +12,7 @@
      - role: '10-inst-packer-vsphere'
      - role: '20-crte-packer-template'
        vars:
+         tf_packer_async: true
          tf_packer_image: "tf-templ-debian11"
          tf_packer_image_name: "{{tf_packer_debian11_name}}"
          tf_packer_image_addition_pkgs: "{{tf_packer_debian11_addition_pkgs}}"
@@ -20,15 +21,17 @@
          tf_packer_image_size: "{{tf_packer_debian11_size}}"
          tf_packer_image_iso_path: "{{tf_packer_debian11_iso_path}}"
        when: tf_packer_debian11
-     - role: '20-crte-packer-template'
-       vars:
-         tf_packer_image: "tf-templ-ubuntu14"
-         tf_packer_image_name: "{{tf_packer_ubuntu14_name}}"
-         tf_packer_image_addition_pkgs: "{{tf_packer_ubuntu14_addition_pkgs}}"
-         tf_packer_image_CPUs: "{{tf_packer_ubuntu14_CPUs}}"
-         tf_packer_image_RAM: "{{tf_packer_ubuntu14_RAM}}"
-         tf_packer_image_size: "{{tf_packer_ubuntu14_size}}"
-         tf_packer_image_iso_path: "{{tf_packer_ubuntu14_iso_path}}"
-       when: tf_packer_ubuntu14
      - role: '10-inst-terraform-vsphere'
      - role: '10-inst-gitlab'
+
+   tasks:
+
+     - name: Wait for packer templating complete
+       async_status:
+         jid: "{{ async_result.ansible_job_id }}"
+       register: deb_job_result
+       until: deb_job_result.finished
+       retries: 120
+       delay: 15
+       when: tf_packer_debian11
+
