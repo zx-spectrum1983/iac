@@ -159,9 +159,6 @@
       shell: |
         sudo gitlab-runner install --user=gitlab-runner --working-directory=/home/gitlab-runner
 
-
-####        sudo gitlab-runner start
-
     - name: Gitlab deploy - register gitlab-runner
       shell: |
         sudo gitlab-runner register --non-interactive --url http://{{ansible_default_ipv4.address}}:8000/ --registration-token "{{gitlab_runner_token.stdout}}" --executor shell --tag-list iac-runner --run-untagged=true
@@ -176,15 +173,15 @@
         cd ..
         [ `git remote | grep init` ] && git remote remove origin || git remote rename origin init
         git remote add origin http://ansible-token:{{gitlab_token.stdout}}@{{ansible_default_ipv4.address}}:8000/{{gitlab_username}}/iac.git
+
+    - name: Gitlab deploy - create project repo
+      shell: |
+        cd ..
+        git fsck
+        git prune
+        git repack
+        git fsck
         git push origin
 
-#    when: not gitlab_status.stat.exists
     when: gitlab_deploy_status
-
-
-#        git remote rename origin init &> /dev/null ; [ $? -eq 3 ] && git remote remove origin
-#        git remote rename origin init &> /dev/null || git remote remove origin
-
-
-
 
