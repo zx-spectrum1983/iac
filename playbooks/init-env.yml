@@ -19,7 +19,6 @@
          tf_packer_image_CPUs: "{{tf_packer_debian11_CPUs}}"
          tf_packer_image_RAM: "{{tf_packer_debian11_RAM}}"
          tf_packer_image_size: "{{tf_packer_debian11_size}}"
-         tf_packer_image_iso_path: "{{tf_packer_debian11_iso_path}}"
        when: tf_packer_debian11
      - role: '10-inst-terraform-vsphere'
      - role: '10-inst-gitlab'

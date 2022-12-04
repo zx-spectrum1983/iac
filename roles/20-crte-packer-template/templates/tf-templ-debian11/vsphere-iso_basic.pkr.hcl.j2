@@ -23,7 +23,8 @@ source "vsphere-iso" "this" {
     disk_thin_provisioned = true
   }
 
-  iso_paths = ["{{tf_packer_image_iso_path}}"]
+  iso_url = "https://cdimage.debian.org/debian-cd/11.5.0/amd64/iso-cd/debian-11.5.0-amd64-netinst.iso"
+  iso_checksum = "e307d0e583b4a8f7e5b436f8413d4707dd4242b70aea61eb08591dc0378522f3"
 
   network_adapters {
     network =  local.network_name
