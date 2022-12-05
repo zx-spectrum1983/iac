@@ -11,7 +11,7 @@ A script for automatic installation and configuration of a system that allows yo
 
 - vSphere 6.7
 - External DNS/DHCP server
-- Debian 11 virtual machine for system installation (4 cores, 8GB RAM)
+- Debian 11 virtual machine for system installation (2 cores, 6GB RAM)
 
 >Attention!
 >This system does not affect existing hosts on the hypervisor. Modification and deletion is possible only for those hosts that were created through this system. If you try to create a host with an existing name, you will get an error.
@@ -26,7 +26,7 @@ During the installation of the system, the configuration and secrets are transfe
 
 The system requires at least one ESXi hypervisor and a virtual machine with vCenter. The network where the hosts will be created must have a DNS/DHCP server configured.
 
-Create a virtual machine with Debian 11 settings, 4 cores, 8GB RAM to install the system on it. On this host, you need to install sudo, git and ansible.
+Create a virtual machine with Debian 11 settings, 2 cores, 6GB RAM to install the system on it. On this host, you need to install sudo, git and ansible.
 
 ```
 # apt install sudo git ansible
@@ -35,7 +35,7 @@ Create a virtual machine with Debian 11 settings, 4 cores, 8GB RAM to install th
 The script is supposed to be run as the ansible user, to do this, add it to the sudo group and disable the password for privilege escalation:
 
 ```
-# usermod -aG sudo your_user
+# usermod -aG sudo ansible
 # visudo
 Append at the end of the file:
 %sudo ALL=(ALL) NOPASSWD: ALL
@@ -75,8 +75,8 @@ In the ansible user's home directory, create two installation configuration file
 
   "tf_packer_debian11": true,
   "tf_packer_debian11_name": "tf-templ-debian11",
-  "tf_packer_debian11_CPUs": "1",
-  "tf_packer_debian11_RAM": "1024",
+  "tf_packer_debian11_CPUs": "2",
+  "tf_packer_debian11_RAM": "2048",
   "tf_packer_debian11_size": "32768",
   "tf_packer_debian11_addition_pkgs" : "git ansible mc",
 
