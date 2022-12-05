@@ -11,8 +11,8 @@ localhost ansible_connection=local
 #pod02-vm1-prl1 yourvar="test"
 
 [prod]
-pod05-vm1-lsb
-pod06-vm1-frt
+#pod05-vm1-lsb
+#pod06-vm1-frt
 #pod07-vm1-bkd tf_cpu_count=2 tf_memory=6144 tf_datastore="datastore2"
 #pod09-vm1-dbe tf_cpu_count=4 tf_memory=12288 tf_datastore="datastore2"
 #pod03-vm1-iac8 tf_memory=6144 tf_user="zz" tf_password="zz" tf_sshkey="~/.ssh/id_rsa.pub"
