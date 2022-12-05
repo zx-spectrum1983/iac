@@ -98,7 +98,7 @@ In the ansible user's home directory, create two installation configuration file
 }
 ```
 
-Run the following commands to start the installation:
+Run the following commands from ansible user to start the installation:
 
 ```
 @ git clone https://github.com/zx-spectrum1983/iac.git
@@ -107,6 +107,9 @@ Run the following commands to start the installation:
 ```
 
 If something went wrong during the installation process, find out what is missing and run the script again. Once installed, delete the init-cloud.json and init-iac.json files.
+
+## Usage:
+
 
 ## Contact:
 
